@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "705070059687",
+    "project_id": "hrsys-8a225",
+    "storage_bucket": "hrsys-8a225.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:705070059687:android:661fd33e2583799d6dcb82",
+        "android_client_info": {
+          "package_name": "com.example.hr_flow"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZkkSza8aDF4XM83a84ZbaHX47YG1i5eE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
