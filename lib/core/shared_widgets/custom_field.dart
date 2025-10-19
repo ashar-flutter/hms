@@ -52,13 +52,13 @@ class _CustomFieldState extends State<CustomField> {
           filled: true,
           fillColor: Colors.white,
           hintText: widget.hintText,
-          hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 15),
+          hintStyle: TextStyle(color: Colors.grey.shade900, fontSize: 15),
           prefixIcon: widget.prefix,
           suffixIcon: widget.isPassword
               ? IconButton(
             icon: Icon(
               _obscureText ? Iconsax.eye_slash : Iconsax.eye,
-              color: Colors.grey.shade600,
+              color: Colors.deepPurple.shade700,
             ),
             onPressed: () {
               setState(() {

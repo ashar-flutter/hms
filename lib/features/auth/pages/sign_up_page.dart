@@ -1,11 +1,11 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:hr_flow/core/colors/app_colors.dart';
 import 'package:hr_flow/core/shared_widgets/custom_btn.dart';
 import 'package:hr_flow/core/shared_widgets/custom_field.dart';
 import 'package:hr_flow/core/utils/credential_validation.dart';
 import 'package:hr_flow/features/auth/pages/login_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hr_flow/features/profile/profile_page.dart';
 import 'package:iconsax/iconsax.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -28,16 +28,18 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   Future<void> _attemptSignUp() async {
-    bool isValid = auth.signUpChecks(email: emailCtr.text, password: passCtr.text);
+    bool isValid = auth.signUpChecks(
+      email: emailCtr.text,
+      password: passCtr.text,
+    );
     if (!isValid) return;
     try {
       final user = await FirebaseAuth.instance.authStateChanges().firstWhere(
-            (u) => u != null,
+        (u) => u != null,
         orElse: () => null,
       );
       if (user != null) {
-        emailCtr.clear();
-        passCtr.clear();
+        Get.offAll(() => ProfilePage());
       }
     } catch (_) {}
   }
@@ -60,7 +62,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     fontFamily: "bold",
                     color: Colors.black,
                     fontWeight: FontWeight.w700,
-                    fontSize: 22,
+                    fontSize: 24,
                   ),
                 ),
               ),
@@ -70,9 +72,9 @@ class _SignUpPageState extends State<SignUpPage> {
                   "create your account to get started",
                   style: TextStyle(
                     fontFamily: "poppins",
-                    color: Colors.grey.shade800,
+                    color: Colors.grey.shade900,
                     fontWeight: FontWeight.w300,
-                    fontSize: 15,
+                    fontSize: 16,
                   ),
                 ),
               ),
@@ -83,9 +85,9 @@ class _SignUpPageState extends State<SignUpPage> {
                   "Email",
                   style: TextStyle(
                     fontFamily: "poppins",
-                    color: Colors.grey.shade700,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                    color: Colors.grey.shade800,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
@@ -105,9 +107,9 @@ class _SignUpPageState extends State<SignUpPage> {
                   "Password",
                   style: TextStyle(
                     fontFamily: "poppins",
-                    color: Colors.grey.shade700,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                    color: Colors.grey.shade800,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
@@ -141,6 +143,8 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                   ),
                   InkWell(
+                    splashColor: Colors.grey.withValues(alpha: 0.3),
+                    highlightColor: Colors.grey.withValues(alpha: 0.1),
                     onTap: () {
                       Get.to(LoginPage());
                     },

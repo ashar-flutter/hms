@@ -7,8 +7,8 @@ class CustomBtn extends StatelessWidget {
     required this.text,
     required this.onPressed});
 
-  static const Color indicatorColor = Color(0xFF5038ED);
-  static const Color onBoardBtn = Color(0xFF988AF4);
+  static const Color gradientStart =  Color(0xFF0D00B3);
+  static const Color gradientEnd = Color(0xFFAA00FF);
 
   @override
   Widget build(BuildContext context) {
@@ -16,37 +16,45 @@ class CustomBtn extends StatelessWidget {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         padding: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(35)),
-        elevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+        elevation: 22,
         backgroundColor: Colors.transparent,
-        shadowColor: Colors.transparent,
+      ).copyWith(
+        overlayColor: WidgetStateProperty.resolveWith<Color?>(
+              (states) {
+            if (states.contains(WidgetState.pressed)) {
+              return Colors.black.withValues(alpha: 0.25);
+            }
+            return null;
+          },
+        ),
       ),
       onPressed: onPressed,
       child: Ink(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [indicatorColor, onBoardBtn],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
+            colors: [gradientStart, gradientEnd],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.all(Radius.circular(35)),
         ),
         child: Container(
           width: screenWidth * 0.9,
-          height: 50,
+          height: 53,
           alignment: Alignment.center,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                text,
-                style: TextStyle(
-                  fontFamily: "bold",
-                  color: Colors.white,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.8,
-                )
+                  text,
+                  style: TextStyle(
+                    fontFamily: "bold",
+                    color: Colors.white,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.8,
+                  )
               ),
             ],
           ),

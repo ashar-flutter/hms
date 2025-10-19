@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:hr_flow/core/colors/app_colors.dart';
 import 'package:hr_flow/core/services/forget_password_service.dart';
 import 'package:hr_flow/core/shared_widgets/custom_btn.dart';
 import 'package:hr_flow/core/shared_widgets/custom_field.dart';
+import 'package:iconsax/iconsax.dart';
 
 import '../../../core/snackbar/custom_snackbar.dart';
 
@@ -38,7 +38,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
                   style: TextStyle(
                     fontFamily: "bold",
                     color: Colors.black,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w800,
                     fontSize: 22,
                   ),
                 ),
@@ -49,8 +49,8 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
                   "Please enter your email",
                   style: TextStyle(
                     fontFamily: "poppins",
-                    color: Colors.grey,
-                    fontWeight: FontWeight.w300,
+                    color: Colors.grey.shade700,
+                    fontWeight: FontWeight.w400,
                     fontSize: 15,
                   ),
                 ),
@@ -72,8 +72,9 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
                 controller: mailCtr,
                 hintText: "Enter your email",
                 prefix: Icon(
-                  Icons.mail_lock_rounded,
-                  color: AMColors.onBoardBtn,
+                  Iconsax.sms,
+                  color: Colors.deepPurple.shade700,
+                  size: 26,
                 ),
                 isPassword: false,
               ),

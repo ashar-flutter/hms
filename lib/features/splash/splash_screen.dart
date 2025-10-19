@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hr_flow/core/colors/app_colors.dart';
 import 'package:hr_flow/features/onboarding/main_page.dart';
+import 'package:hr_flow/features/profile/profile_page.dart';
+import 'package:hr_flow/features/dashboard/main_dashboard.dart';
+
+import '../../core/services/credential_store_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -31,7 +35,7 @@ class _SplashScreenState extends State<SplashScreen>
     );
 
     _slideAnimation = Tween<Offset>(
-      begin: const Offset(0.6, 0), // right side se aayega
+      begin: const Offset(0.6, 0),
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _controller,
@@ -40,15 +44,35 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    _controller.addStatusListener((status) {
+    _controller.addStatusListener((status) async {
       if (status == AnimationStatus.completed) {
-        Future.delayed(const Duration(milliseconds: 300), () {
+        await Future.delayed(const Duration(milliseconds: 300));
+
+        final isLoggedIn = await SecureStorageService.isLoggedIn();
+        final isProfileCompleted = await SecureStorageService.isProfileCompleted();
+
+        if (isLoggedIn && isProfileCompleted) {
+          Get.offAll(
+                () => const MainDashboard(
+              firstname: '',
+              lastname: '',
+            ),
+            transition: Transition.fadeIn,
+            duration: const Duration(milliseconds: 500),
+          );
+        } else if (isLoggedIn && !isProfileCompleted) {
+          Get.offAll(
+                () => const ProfilePage(),
+            transition: Transition.fadeIn,
+            duration: const Duration(milliseconds: 500),
+          );
+        } else {
           Get.offAll(
                 () => const MainPage(),
             transition: Transition.fadeIn,
             duration: const Duration(milliseconds: 500),
           );
-        });
+        }
       }
     });
   }
@@ -72,12 +96,12 @@ class _SplashScreenState extends State<SplashScreen>
               "LA Digital Agency",
               textAlign: TextAlign.center,
               style: TextStyle(
-                 fontFamily: "bold",
+                fontFamily: "bold",
                 fontWeight: FontWeight.w700,
                 color: AMColors.splashText,
                 fontSize: 32,
                 letterSpacing: 1.4,
-              )
+              ),
             ),
           ),
         ),
@@ -85,4 +109,3 @@ class _SplashScreenState extends State<SplashScreen>
     );
   }
 }
-

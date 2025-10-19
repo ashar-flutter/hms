@@ -3,11 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:hr_flow/core/snackbar/custom_snackbar.dart';
 import 'package:iconsax/iconsax.dart';
 
+import 'credential_store_service.dart';
+
 class CredentialService {
   final _auth = FirebaseAuth.instance;
   Future<void> signIn(String email, String password) async {
     try {
-      await _auth.signInWithEmailAndPassword(email: email, password: password).then((_) {
+      await _auth.signInWithEmailAndPassword
+        (email: email, password: password).then((_)async {
+        await SecureStorageService.saveLoginState(true);
         CustomSnackBar.show(
           title: "Success",
           message: "Login Successful",
@@ -34,7 +38,9 @@ class CredentialService {
   //  Sign Up Method
   Future<void> signUp(String email, String password) async {
     try {
-      await _auth.createUserWithEmailAndPassword(email: email, password: password).then((_) {
+      await _auth.createUserWithEmailAndPassword
+        (email: email, password: password).then((_) async{
+        await SecureStorageService.saveLoginState(true);
         CustomSnackBar.show(
           title: "Success",
           message: "Account Created Successfully",

@@ -1,6 +1,5 @@
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:hr_flow/core/colors/app_colors.dart';
 import 'package:hr_flow/core/shared_widgets/custom_btn.dart';
 import 'package:hr_flow/core/shared_widgets/custom_field.dart';
 import 'package:hr_flow/core/utils/credential_validation.dart';
@@ -8,6 +7,8 @@ import 'package:hr_flow/features/auth/pages/forget_password_page.dart';
 import 'package:hr_flow/features/auth/pages/sign_up_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:iconsax/iconsax.dart';
+
+import '../../profile/profile_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -37,8 +38,7 @@ class _LoginPageState extends State<LoginPage> {
         orElse: () => null,
       );
       if (user != null) {
-        emailCnt.clear();
-        passwordCnt.clear();
+        Get.offAll(() => ProfilePage());
       }
     } catch (_) {}
   }
@@ -56,12 +56,12 @@ class _LoginPageState extends State<LoginPage> {
               Padding(
                 padding: const EdgeInsets.only(left: 20),
                 child: Text(
-                  "Login Account",
+                  "Login Account!",
                   style: TextStyle(
                     fontFamily: "bold",
                     color: Colors.black,
                     fontWeight: FontWeight.w700,
-                    fontSize: 22,
+                    fontSize: 24,
                   ),
                 ),
               ),
@@ -71,9 +71,9 @@ class _LoginPageState extends State<LoginPage> {
                   "Please login with registered account",
                   style: TextStyle(
                     fontFamily: "poppins",
-                    color: Colors.grey.shade800,
+                    color: Colors.grey.shade900,
                     fontWeight: FontWeight.w300,
-                    fontSize: 15,
+                    fontSize: 16,
                   ),
                 ),
               ),
@@ -84,9 +84,9 @@ class _LoginPageState extends State<LoginPage> {
                   "Email",
                   style: TextStyle(
                     fontFamily: "poppins",
-                    color: Colors.grey.shade700,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                    color: Colors.grey.shade900,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
@@ -106,9 +106,9 @@ class _LoginPageState extends State<LoginPage> {
                   "Password",
                   style: TextStyle(
                     fontFamily: "poppins",
-                    color: Colors.grey.shade700,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                    color: Colors.grey.shade900,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
@@ -127,16 +127,18 @@ class _LoginPageState extends State<LoginPage> {
                 child: Align(
                   alignment: Alignment.topRight,
                   child: InkWell(
+                    splashColor: Colors.grey.withValues(alpha: 0.3),
+                    highlightColor: Colors.grey.withValues(alpha: 0.1),
                     onTap: () {
                       Get.to(ForgetPasswordPage());
                     },
                     child: Text(
                       "Forgot Password?",
                       style: TextStyle(
-                        fontFamily: "bold",
-                        fontSize: 15,
-                        color: Colors.blueGrey[900],
-                        fontWeight: FontWeight.w500,
+                        fontFamily: "poppins",
+                        fontSize: 16,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w900,
                         letterSpacing: 0.4,
                       ),
                     ),
@@ -157,12 +159,14 @@ class _LoginPageState extends State<LoginPage> {
                     style: TextStyle(
                       fontFamily: "poppins",
                       fontSize: 16,
-                      color: Colors.grey[700],
+                      color: Colors.grey[800],
                       fontWeight: FontWeight.w500,
                       letterSpacing: 0.3,
                     ),
                   ),
                   InkWell(
+                    splashColor: Colors.grey.withValues(alpha: 0.3),
+                    highlightColor: Colors.grey.withValues(alpha: 0.1),
                     onTap: () {
                       Get.to(SignUpPage());
                     },

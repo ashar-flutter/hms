@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 class OnboardingThree extends StatelessWidget {
   const OnboardingThree({super.key});
 
@@ -27,9 +26,8 @@ class OnboardingThree extends StatelessWidget {
                 fontFamily: "bold",
                 decoration: TextDecoration.none,
                 color: Colors.black,
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
-              )
+                fontSize: 18,
+              ),
             ),
           ),
           Align(
@@ -42,7 +40,7 @@ class OnboardingThree extends StatelessWidget {
                 color: Colors.grey.shade500,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-              )
+              ),
             ),
           ),
 
@@ -50,13 +48,13 @@ class OnboardingThree extends StatelessWidget {
             alignment: Alignment.center,
             child: Text(
               "payslips, and more.",
-              style:TextStyle(
+              style: TextStyle(
                 fontFamily: "poppins",
                 decoration: TextDecoration.none,
                 color: Colors.grey.shade500,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-              )
+              ),
             ),
           ),
         ],

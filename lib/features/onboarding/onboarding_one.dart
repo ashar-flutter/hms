@@ -23,8 +23,7 @@ class OnboardingOne extends StatelessWidget {
                 fontFamily: "bold",
                 decoration: TextDecoration.none,
                 color: Colors.black,
-                fontSize: 24,
-                fontWeight: FontWeight.w600
+                fontSize: 18,
             )
             ),
           ),
