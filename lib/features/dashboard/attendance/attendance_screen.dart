@@ -1,12 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
+import 'package:hr_flow/core/colors/gradients.dart';
+import 'package:hr_flow/features/dashboard/attendance/position/position.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/services/attendance_service.dart';
 import '../../../core/snackbar/custom_snackbar.dart';
+import 'controller/check_controller.dart';
+import 'local_storage/attendance_controller.dart';
+import 'map/my_map.dart';
 
 class AttendanceScreen extends StatefulWidget {
   const AttendanceScreen({super.key});
@@ -17,16 +21,7 @@ class AttendanceScreen extends StatefulWidget {
 
 class _AttendanceScreenState extends State<AttendanceScreen>
     with SingleTickerProviderStateMixin {
-  final List<Color> checkInGradient = [
-    Color(0xFF00695C),
-    Color(0xFF00E676),
-    Color(0xFF00BFA5),
-  ];
-  final List<Color> checkOutGradient = [
-    Color(0xFF4A0000),
-    Color(0xFFD50000),
-    Color(0xFFFF1744),
-  ];
+  late AttendanceController _controller;
 
   bool isCheck = true;
   Duration _workDuration = Duration.zero;
@@ -35,7 +30,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
   Duration _breakDuration = Duration.zero;
   Timer? _breakTimer;
   final LatLng _fixedPosition = const LatLng(31.4686680, 74.3122560);
-  late AnimationController _controller;
+  late AnimationController controller;
   late Animation<double> _animation;
   String? _checkInDate;
   String? _checkInTime;
@@ -43,21 +38,26 @@ class _AttendanceScreenState extends State<AttendanceScreen>
   LatLng? _currentPosition;
 
   late AttendanceService attendanceService;
+  late CheckController _checkController;
 
   @override
   void initState() {
     super.initState();
-
+    _controller = AttendanceController();
+    _checkController = CheckController();
     attendanceService = AttendanceService(fixedPosition: _fixedPosition);
 
-    _controller = AnimationController(
+    controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 1),
     )..repeat(reverse: true);
     _animation = Tween<double>(
       begin: 0,
       end: 12,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+    ).animate(CurvedAnimation(parent: controller, curve: Curves.easeInOut));
+
+    // Restore previous state
+    _restorePreviousState();
 
     attendanceService.checkPermission().then((granted) {
       if (granted) {
@@ -68,6 +68,48 @@ class _AttendanceScreenState extends State<AttendanceScreen>
         });
       }
     });
+  }
+
+  Future<void> _restorePreviousState() async {
+    // Restore check-in state from controller
+    await _controller.restoreState();
+
+    if (_controller.isCheckedIn) {
+      // If user was checked in, restore all states
+      setState(() {
+        isCheck = false;
+        _checkInDate = _controller.checkInDate;
+        _checkInTime = _controller.checkInTimeString;
+        _workDuration = _controller.elapsed;
+
+        // Restore break state from storage
+        _restoreBreakState();
+      });
+
+      // Start work timer from saved time
+      _workTimer = Timer.periodic(
+        const Duration(seconds: 1),
+        (_) => setState(() => _workDuration += const Duration(seconds: 1)),
+      );
+    }
+  }
+
+  Future<void> _restoreBreakState() async {
+    // Restore break status and duration from storage
+    final breakStatus = await _controller.getBreakStatus();
+    final breakDuration = await _controller.getBreakDuration();
+
+    setState(() {
+      isOnBreak = breakStatus;
+      _breakDuration = breakDuration;
+    });
+
+    // If break was active, restart break timer
+    if (isOnBreak) {
+      _breakTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+        setState(() => _breakDuration += const Duration(seconds: 1));
+      });
+    }
   }
 
   @override
@@ -100,16 +142,42 @@ class _AttendanceScreenState extends State<AttendanceScreen>
     setState(() {
       isCheck = !isCheck;
       if (!isCheck) {
+        // Check In
         _checkInDate = DateFormat('EEE, MMM d, yyyy').format(DateTime.now());
         _checkInTime = DateFormat('hh:mm:ss a').format(DateTime.now());
         _workDuration = Duration.zero;
+
+        // Save to persistent storage
+        _controller.checkIn();
+
         _workTimer = Timer.periodic(
           const Duration(seconds: 1),
           (_) => setState(() => _workDuration += const Duration(seconds: 1)),
         );
+
+        _checkController.recordCheck(
+          isCheckIn: true,
+          workDuration: _workDuration,
+          breakDuration: _breakDuration,
+          currentPosition: _currentPosition!,
+        );
       } else {
+        // Check Out
         _workTimer?.cancel();
         _checkOutTime = DateFormat('hh:mm:ss a').format(DateTime.now());
+
+        // Save to persistent storage
+        _controller.checkOut();
+        // Clear break state on check-out
+        _controller.saveBreakState(false, Duration.zero);
+
+        _checkController.recordCheck(
+          isCheckIn: false,
+          workDuration: _workDuration,
+          breakDuration: _breakDuration,
+          currentPosition: _currentPosition!,
+          existingCheckInTime: _checkInTime,
+        );
       }
     });
   }
@@ -137,6 +205,21 @@ class _AttendanceScreenState extends State<AttendanceScreen>
     } else {
       _breakTimer?.cancel();
     }
+
+    // Save break state to persistent storage
+    _controller.saveBreakState(isOnBreak, _breakDuration);
+
+    if (_currentPosition != null && _checkInDate != null) {
+      _checkController.recordBreak(
+        isOnBreak: isOnBreak,
+        workDuration: _workDuration,
+        breakDuration: _breakDuration,
+        currentPosition: _currentPosition!,
+        date: _checkInDate!,
+        checkInTime: _checkInTime,
+        checkOutTime: _checkOutTime,
+      );
+    }
   }
 
   String _formatDuration(Duration d) {
@@ -157,68 +240,9 @@ class _AttendanceScreenState extends State<AttendanceScreen>
             SizedBox(
               height: screenHeight * 0.5,
               width: double.infinity,
-              child: FlutterMap(
-                options: MapOptions(
-                  initialCenter: _fixedPosition,
-                  initialZoom: 16.5,
-                  interactionOptions: const InteractionOptions(
-                    flags: InteractiveFlag.all,
-                  ),
-                ),
-                children: [
-                  TileLayer(
-                    urlTemplate:
-                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    userAgentPackageName: 'com.ashar.attendance_app',
-                  ),
-                ],
-              ),
+              child: Custom_Map(fixedPosition: _fixedPosition),
             ),
-            Positioned(
-              top: screenHeight * 0.25 - 30,
-              left: 0,
-              right: 0,
-              child: AnimatedBuilder(
-                animation: _animation,
-                builder: (context, child) {
-                  return Transform.translate(
-                    offset: Offset(0, -_animation.value),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Container(
-                          width: 60,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.amberAccent.withValues(alpha: 0.15),
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.26),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: const Icon(
-                            Icons.location_on_rounded,
-                            color: Color(0xFF8B0000),
-                            size: 40,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
+            position(screenHeight: screenHeight, animation: _animation),
             Align(
               alignment: Alignment.bottomCenter,
               child: ClipRRect(
@@ -403,8 +427,8 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                             borderRadius: BorderRadius.circular(30),
                             gradient: LinearGradient(
                               colors: isCheck
-                                  ? checkInGradient
-                                  : checkOutGradient,
+                                  ? AMGradients.checkInGradient
+                                  : AMGradients.checkOutGradient,
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),

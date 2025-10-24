@@ -50,6 +50,10 @@ dependencies:
   open_file: ^3.2.1
   iconify_flutter: ^0.0.6
   permission_handler:
+  cloud_firestore:
+  firebase_messaging:
+  flutter_local_notifications:
+  audioplayers: ^6.5.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -77,6 +81,12 @@ flutter:
      - assets/images/one.png
      - assets/images/two.png
      - assets/images/three.png
+     - assets/dashboard/attendance.png
+     - assets/dashboard/calendar.png
+     - assets/dashboard/documents.png
+     - assets/dashboard/payroll.png
+     - assets/dashboard/reports.png
+     - assets/dashboard/requests.png
 #     - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

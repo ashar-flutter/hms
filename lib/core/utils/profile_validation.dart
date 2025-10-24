@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
 import '../snackbar/custom_snackbar.dart';
 
-class ProfileService {
+class ProfileValidation {
   Future<bool> validation({
     required BuildContext context,
     required String name,

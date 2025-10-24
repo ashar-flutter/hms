@@ -12,6 +12,7 @@ class CredentialService {
       await _auth.signInWithEmailAndPassword
         (email: email, password: password).then((_)async {
         await SecureStorageService.saveLoginState(true);
+        await SecureStorageService.saveUid(_auth.currentUser!.uid);
         CustomSnackBar.show(
           title: "Success",
           message: "Login Successful",
@@ -41,6 +42,7 @@ class CredentialService {
       await _auth.createUserWithEmailAndPassword
         (email: email, password: password).then((_) async{
         await SecureStorageService.saveLoginState(true);
+        await SecureStorageService.saveUid(_auth.currentUser!.uid);
         CustomSnackBar.show(
           title: "Success",
           message: "Account Created Successfully",

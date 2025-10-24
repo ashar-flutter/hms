@@ -1,120 +1,72 @@
 import 'package:flutter/material.dart';
-import 'package:iconify_flutter/iconify_flutter.dart';
 
-class CustomCard extends StatefulWidget {
-  final String? label;
-  final String? iconName;
-  final List<Color>? gradientColors;
+class CustomCard extends StatelessWidget {
+  final String imagePath;
+  final String text;
   final VoidCallback? onTap;
 
   const CustomCard({
     super.key,
-    this.label,
-    this.iconName,
-    this.gradientColors,
+    required this.text,
+    required this.imagePath,
     this.onTap,
   });
 
   @override
-  State<CustomCard> createState() => _CustomCardState();
-}
-
-class _CustomCardState extends State<CustomCard> {
-  bool _isPressed = false;
-
-  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown: (_) => setState(() => _isPressed = true),
-      onTapUp: (_) {
-        setState(() => _isPressed = false);
-        if (widget.onTap != null) widget.onTap!();
-      },
-      onTapCancel: () => setState(() => _isPressed = false),
-      child: AnimatedScale(
-        duration: const Duration(milliseconds: 120),
-        scale: _isPressed ? 0.94 : 1.0,
-        curve: Curves.easeOut,
+      onTap: onTap,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
         child: Container(
-          width: 105,
-          height: 105,
+          height: 100,
+          width: 100,
           decoration: BoxDecoration(
-
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xFFE8F1FF), // very light blue top
-                Color(0xFFD1E4FF), // soft sky blue middle
-                Color(0xFFB8D4FF), // pleasant light blue base
-              ],
-            ),
-
-            borderRadius: BorderRadius.circular(22),
+            borderRadius: BorderRadius.circular(14),
+            color: Color(0xFFFFFFFF),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.18),
-                blurRadius: 25,
-                spreadRadius: 2,
-                offset: const Offset(5, 8),
-              ),
-              BoxShadow(
-                color: Colors.white.withValues(alpha: 0.9),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 10,
-                spreadRadius: -5,
-                offset: const Offset(-5, -5),
+                spreadRadius: 2,
+                offset: Offset(0, 4),
               ),
             ],
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.9),
-              width: 2,
-            ),
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (widget.iconName != null)
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  height: 38,
+                  width: 38,
+                  padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors:
-                          widget.gradientColors ??
-                          [const Color(0xFF6A11CB), const Color(0xFF2575FC)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color:
-                            (widget.gradientColors?[0] ??
-                                    const Color(0xFF6A11CB))
-                                .withValues(alpha: 0.4),
-                        blurRadius: 12,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
+                    color: Color(0xFFDEDAFC),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Iconify(
-                    widget.iconName!,
-                    size: 28,
-                    color: Colors.white,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(6),
+                      image: DecorationImage(
+                        image: AssetImage(imagePath),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
                   ),
                 ),
-              if (widget.label != null) ...[
-                const SizedBox(height: 10),
+                SizedBox(height: 5),
                 Text(
-                  widget.label!,
+                  text,
                   style: TextStyle(
                     fontFamily: "bold",
-                    fontSize: 13,
-                    color: Colors.grey.shade700,
-                    letterSpacing: 0.3,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF36434A),
+                    fontSize: 12,
                   ),
-                ),
+                )
               ],
-            ],
+            ),
           ),
         ),
       ),

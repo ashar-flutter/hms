@@ -4,10 +4,12 @@ import 'package:hr_flow/core/shared_widgets/custom_btn.dart';
 import 'package:iconsax/iconsax.dart';
 import '../../core/services/credential_store_service.dart';
 import '../../core/shared_widgets/custom_field.dart';
-import '../../core/services/profile_service.dart';
+import '../../core/utils/profile_validation.dart';
 import '../../core/services/image_picker_service.dart';
 import '../../core/snackbar/custom_snackbar.dart';
+import '../admin_dashboard/admin_dashboard.dart';
 import '../dashboard/main_dashboard.dart';
+import 'controller/profile_controller.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -21,7 +23,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final lastCtr = TextEditingController();
   final emailCtr = TextEditingController();
   final roleCtr = TextEditingController();
-  final profileService = ProfileService();
+  final profileService = ProfileValidation();
   final imageService = ImagePickerService();
   File? _profileImage;
 
@@ -201,6 +203,15 @@ class _ProfilePageState extends State<ProfilePage> {
       return;
     }
 
+    final success = await ProfileController().saveProfile(
+      firstName: name,
+      lastName: last,
+      role: role,
+      imagePath: _profileImage!.path,
+    );
+
+    if (!success) return;
+
     CustomSnackBar.show(
       title: "Success",
       message: "Profile setup completed successfully",
@@ -217,15 +228,20 @@ class _ProfilePageState extends State<ProfilePage> {
     await Future.delayed(const Duration(milliseconds: 600));
 
     if (!mounted) return;
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => MainDashboard(
-          firstname: name,
-          lastname: last,
+    if (role == 'admin') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => AdminDashboard()),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) =>
+              MainDashboard(firstname: nameCtr.text, lastname: lastCtr.text),
         ),
-      ),
-    );
+      );
+    }
   }
 
   @override
