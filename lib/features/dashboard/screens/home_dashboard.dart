@@ -1,14 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:hr_flow/features/dashboard/attendance/attendance_screen.dart';
+import 'package:hr_flow/features/dashboard/documents/screens/main_document_page.dart';
+import 'package:hr_flow/features/dashboard/payroll/main_payroll_page.dart';
+import 'package:hr_flow/features/dashboard/reports/reports.dart';
 import 'package:hr_flow/features/dashboard/requests/main_request_screen.dart';
+import 'package:hr_flow/features/dashboard/screens/attendance_card.dart';
 import 'package:hr_flow/features/dashboard/screens/custom_card.dart';
 import 'package:get/get.dart';
+import 'package:hr_flow/features/dashboard/screens/request_notification_screen.dart';
+import '../requests/controller/notification_controller.dart';
 
 class HomeDashboard extends StatelessWidget {
   final String fName;
   final String lName;
 
-  const HomeDashboard({super.key, required this.fName, required this.lName});
+  HomeDashboard({super.key, required this.fName, required this.lName});
+  final NotificationController notificationController =
+      Get.find<NotificationController>();
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +25,7 @@ class HomeDashboard extends StatelessWidget {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70),
         child: AppBar(
+          automaticallyImplyLeading: false,
           centerTitle: true,
           title: Center(
             child: Column(
@@ -28,7 +37,7 @@ class HomeDashboard extends StatelessWidget {
                       : 'Dashboard',
                   style: const TextStyle(
                     fontFamily: "bold",
-                    fontSize: 17,
+                    fontSize: 15,
                     color: Colors.black,
                   ),
                 ),
@@ -53,65 +62,135 @@ class HomeDashboard extends StatelessWidget {
               ],
             ),
           ),
+          actions: [
+            Obx(
+              () => Stack(
+                children: [
+                  Container(
+                    height: 40,
+                    width: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: Color(0xFFE9E9E9),
+                      border: Border.all(
+                        color: Colors.amber,
+                        width: 1.2
+                      )
+                    ),
+                    child: IconButton(
+                      icon: Icon(
+                          size: 26,
+                          Icons.notifications, color: Colors.black),
+                      onPressed: () {
+                        Get.to(
+                          () => NotificationsScreen(),
+                        );
+                      },
+                    ),
+                  ),
+                  if (notificationController.unreadCount.value > 0)
+                    Positioned(
+                      right: 1,
+                      top: 10,
+                      child: Container(
+                        padding: EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        constraints: BoxConstraints(
+                          minWidth: 18,
+                          minHeight: 18,
+                        ),
+                        child: Text(
+                          '${notificationController.unreadCount.value}',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            SizedBox(width: 10),
+          ],
         ),
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            SizedBox(height: AppBar().preferredSize.height / 2),
-            const Padding(
-              padding: EdgeInsets.only(left: 15),
-              child: Align(
-                alignment: Alignment.topLeft,
-                child: Text(
-                  "What would you like to do?",
-                  style: TextStyle(fontFamily: "bold", color: Colors.black),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              SizedBox(height: AppBar().preferredSize.height / 2),
+              AttendanceCard(),
+              SizedBox(height: AppBar().preferredSize.height / 2),
+              const Padding(
+                padding: EdgeInsets.only(left: 15),
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Text(
+                    "What would you like to do?",
+                    style: TextStyle(fontFamily: "bold", color: Colors.black),
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: AppBar().preferredSize.height / 2),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                CustomCard(
-                  onTap: () {
-                    Get.to(AttendanceScreen());
-                  },
-                  text: "Attendance",
-                  imagePath: "assets/dashboard/attendance.png",
-                ),
-                CustomCard(
-                  onTap: () {
-                    Get.to(MainRequestScreen());
-                  },
-                  text: "Requests",
-                  imagePath: "assets/dashboard/requests.png",
-                ),
-                CustomCard(
-                  text: "Documents",
-                  imagePath: "assets/dashboard/documents.png",
-                ),
-              ],
-            ),
-            SizedBox(height: 15),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                CustomCard(
-                  text: "Reports",
-                  imagePath: "assets/dashboard/reports.png",
-                ),
-                CustomCard(
-                  text: "Payroll",
-                  imagePath: "assets/dashboard/payroll.png",
-                ),
-                CustomCard(
-                  text: "Calendar",
-                  imagePath: "assets/dashboard/calendar.png",
-                ),
-              ],
-            ),
-          ],
+              SizedBox(height: AppBar().preferredSize.height / 2),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  CustomCard(
+                    onTap: () {
+                      Get.to(() => AttendanceScreen());
+                    },
+                    text: "Attendance",
+                    imagePath: "assets/dashboard/attendance.png",
+                  ),
+                  CustomCard(
+                    onTap: () {
+                      Get.to(() => MainRequestScreen());
+                    },
+                    text: "Requests",
+                    imagePath: "assets/dashboard/requests.png",
+                  ),
+                  CustomCard(
+                    onTap: () {
+                      Get.to(() => MainDocumentPage());
+                    },
+                    text: "Documents",
+                    imagePath: "assets/dashboard/documents.png",
+                  ),
+                ],
+              ),
+              SizedBox(height: 15),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  CustomCard(
+                    onTap: () {
+                      Get.to(() => Reports());
+                    },
+                    text: "Reports",
+                    imagePath: "assets/dashboard/reports.png",
+                  ),
+                  CustomCard(
+                    onTap: () {
+                      Get.to(() => MainPayrollPage());
+                    },
+                    text: "Payroll",
+                    imagePath: "assets/dashboard/payroll.png",
+                  ),
+                  CustomCard(
+                    text: "Calendar",
+                    imagePath: "assets/dashboard/calendar.png",
+                  ),
+                ],
+              ),
+              SizedBox(height: AppBar().preferredSize.height),
+            ],
+          ),
         ),
       ),
     );

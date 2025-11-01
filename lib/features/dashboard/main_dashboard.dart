@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:hr_flow/features/chats/screens/main_chat_screen.dart';
 import 'package:hr_flow/features/dashboard/screens/home_dashboard.dart';
 import 'package:hr_flow/core/services/credential_store_service.dart';
+import 'package:hr_flow/features/user/user_information/user_information.dart';
 
 import '../profile/service/profile_update_service.dart';
-
 
 class MainDashboard extends StatefulWidget {
   final String firstname;
@@ -31,7 +31,7 @@ class _MainDashboardState extends State<MainDashboard> {
       HomeDashboard(fName: '', lName: ''),
       const Center(child: Text("History Screen")),
       MainChatScreen(),
-      const Center(child: Text("Profile Screen")),
+      UserInformation(),
     ];
     _loadUserData();
     _updateExistingProfiles();
@@ -54,7 +54,7 @@ class _MainDashboardState extends State<MainDashboard> {
           ),
           const Center(child: Text("History Screen")),
           MainChatScreen(),
-          const Center(child: Text("Profile Screen")),
+          UserInformation(),
         ];
       });
     }
@@ -62,97 +62,117 @@ class _MainDashboardState extends State<MainDashboard> {
 
   @override
   Widget build(BuildContext context) {
+    final List<Map<String, dynamic>> navItems = [
+      {'icon': Icons.home, 'label': "Home", 'index': 0},
+      {'icon': Icons.history, 'label': "History", 'index': 1},
+      {'icon': Icons.message_rounded, 'label': "Message", 'index': 2},
+      {'icon': Icons.account_circle_rounded, 'label': "Profile", 'index': 3},
+    ];
+
     return Scaffold(
       extendBody: true,
       body: _screens[_selectedIndex],
-      bottomNavigationBar: Container(
+      bottomNavigationBar: SizedBox(
         height: 90,
-        margin: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: const Color(0xFF0A0F2D),
-          borderRadius: BorderRadius.circular(25),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF6366F1).withAlpha(100),
-              blurRadius: 25,
-              spreadRadius: 3,
-              offset: const Offset(0, 10),
-            ),
-            BoxShadow(
-              color: Colors.black.withAlpha(120),
-              blurRadius: 30,
-              offset: const Offset(0, -8),
-            ),
-          ],
-          border: Border.all(color: const Color(0xFF404A6C), width: 1.5),
-        ),
-        child: Row(
+        child: Stack(
+          alignment: Alignment.bottomCenter,
           children: [
-            _buildNavItem(Icons.home_rounded, "Home", 0),
-            _buildNavItem(Icons.assignment_rounded, "History", 1),
-            _buildNavItem(Icons.forum_rounded, "Chats", 2),
-            _buildNavItem(Icons.account_circle_rounded, "Profile", 3),
+            Container(
+              height: 70,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildNavItem(navItems[0], 0),
+                  _buildNavItem(navItems[1], 1),
+                  const SizedBox(width: 60),
+                  _buildNavItem(navItems[2], 2),
+                  _buildNavItem(navItems[3], 3),
+                ],
+              ),
+            ),
+            Positioned(
+              top: 0,
+              child: GestureDetector(
+                onTap: () {},
+                child: Container(
+                  width: 65,
+                  height: 65,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF6366F1).withValues(alpha: 0.4),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: const Icon(Icons.add, color: Colors.white, size: 24),
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildNavItem(IconData icon, String label, int index) {
-    bool isSelected = _selectedIndex == index;
+  Widget _buildNavItem(Map<String, dynamic> item, int index) {
+    bool isSelected = _selectedIndex == item['index'];
+    IconData icon = item['icon'];
+    String label = item['label'];
 
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-        child: SizedBox(
-          height: 90,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                width: 50,
-                height: 34,
-                decoration: BoxDecoration(
-                  gradient: isSelected
-                      ? const LinearGradient(
-                          colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        )
-                      : null,
-                  borderRadius: BorderRadius.circular(12),
-                  border: isSelected
-                      ? Border.all(
-                          color: Colors.white.withAlpha(40),
-                          width: 1.5,
-                        )
-                      : null,
-                ),
-                child: Icon(
-                  icon,
-                  size: 22,
-                  color: isSelected ? Colors.white : const Color(0xFFD1D5DB),
-                ),
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedIndex = index;
+        });
+      },
+      child: Container(
+        width: 60,
+        height: 70,
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 24,
+              color: isSelected
+                  ? const Color(0xFF6366F1)
+                  : const Color(0xFF9CA3AF),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                color: isSelected
+                    ? const Color(0xFF6366F1)
+                    : const Color(0xFF9CA3AF),
               ),
-              const SizedBox(height: 8),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                  color: isSelected
-                      ? const Color(0xFF60A5FA)
-                      : const Color(0xFF9CA3AF),
-                  letterSpacing: 0.3,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

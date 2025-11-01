@@ -1,13 +1,14 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:hr_flow/core/colors/gradients.dart';
 import 'package:hr_flow/features/dashboard/attendance/position/position.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:intl/intl.dart';
-
 import '../../../core/services/attendance_service.dart';
 import '../../../core/snackbar/custom_snackbar.dart';
+import 'attendance_status_controller.dart';
 import 'controller/check_controller.dart';
 import 'local_storage/attendance_controller.dart';
 import 'map/my_map.dart';
@@ -22,13 +23,13 @@ class AttendanceScreen extends StatefulWidget {
 class _AttendanceScreenState extends State<AttendanceScreen>
     with SingleTickerProviderStateMixin {
   late AttendanceController _controller;
-
   bool isCheck = true;
   Duration _workDuration = Duration.zero;
   Timer? _workTimer;
   bool isOnBreak = false;
   Duration _breakDuration = Duration.zero;
   Timer? _breakTimer;
+  DateTime? _breakStartTime;
   final LatLng _fixedPosition = const LatLng(31.4686680, 74.3122560);
   late AnimationController controller;
   late Animation<double> _animation;
@@ -36,9 +37,9 @@ class _AttendanceScreenState extends State<AttendanceScreen>
   String? _checkInTime;
   String? _checkOutTime;
   LatLng? _currentPosition;
-
   late AttendanceService attendanceService;
   late CheckController _checkController;
+  StreamSubscription<LatLng>? _positionStreamSub;
 
   @override
   void initState() {
@@ -46,77 +47,75 @@ class _AttendanceScreenState extends State<AttendanceScreen>
     _controller = AttendanceController();
     _checkController = CheckController();
     attendanceService = AttendanceService(fixedPosition: _fixedPosition);
-
+    Get.put(SecureAttendanceController(), permanent: true);
     controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 1),
     )..repeat(reverse: true);
-    _animation = Tween<double>(
-      begin: 0,
-      end: 12,
-    ).animate(CurvedAnimation(parent: controller, curve: Curves.easeInOut));
-
-    // Restore previous state
+    _animation = Tween<double>(begin: 0, end: 12)
+        .animate(CurvedAnimation(parent: controller, curve: Curves.easeInOut));
     _restorePreviousState();
-
     attendanceService.checkPermission().then((granted) {
       if (granted) {
-        attendanceService.getPositionStream().listen((pos) {
-          setState(() {
-            _currentPosition = pos;
-          });
+        _positionStreamSub = attendanceService.getPositionStream().listen((pos) {
+          if (mounted) {
+            setState(() {
+              _currentPosition = pos;
+            });
+          }
         });
       }
     });
   }
 
   Future<void> _restorePreviousState() async {
-    // Restore check-in state from controller
     await _controller.restoreState();
-
     if (_controller.isCheckedIn) {
-      // If user was checked in, restore all states
-      setState(() {
-        isCheck = false;
-        _checkInDate = _controller.checkInDate;
-        _checkInTime = _controller.checkInTimeString;
-        _workDuration = _controller.elapsed;
-
-        // Restore break state from storage
-        _restoreBreakState();
+      if (mounted) {
+        setState(() {
+          isCheck = false;
+          _checkInDate = _controller.checkInDate;
+          _checkInTime = _controller.checkInTimeString;
+          _workDuration = _controller.elapsed;
+        });
+      }
+      await _restoreBreakState();
+      _workTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+        if (mounted) {
+          setState(() => _workDuration += const Duration(seconds: 1));
+        }
       });
-
-      // Start work timer from saved time
-      _workTimer = Timer.periodic(
-        const Duration(seconds: 1),
-        (_) => setState(() => _workDuration += const Duration(seconds: 1)),
-      );
     }
   }
 
   Future<void> _restoreBreakState() async {
-    // Restore break status and duration from storage
     final breakStatus = await _controller.getBreakStatus();
     final breakDuration = await _controller.getBreakDuration();
-
-    setState(() {
-      isOnBreak = breakStatus;
-      _breakDuration = breakDuration;
-    });
-
-    // If break was active, restart break timer
+    if (mounted) {
+      setState(() {
+        isOnBreak = breakStatus;
+        _breakDuration = breakDuration;
+      });
+    }
     if (isOnBreak) {
+      _breakStartTime = DateTime.now().subtract(_breakDuration);
       _breakTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-        setState(() => _breakDuration += const Duration(seconds: 1));
+        if (mounted) {
+          setState(() {
+            _breakDuration = DateTime.now().difference(_breakStartTime!);
+          });
+        }
       });
     }
   }
 
   @override
   void dispose() {
+    controller.dispose();
     _controller.dispose();
     _workTimer?.cancel();
     _breakTimer?.cancel();
+    _positionStreamSub?.cancel();
     super.dispose();
   }
 
@@ -138,51 +137,50 @@ class _AttendanceScreenState extends State<AttendanceScreen>
       );
       return;
     }
-
+    if (!mounted) return;
+    final secureController = Get.find<SecureAttendanceController>();
     setState(() {
       isCheck = !isCheck;
       if (!isCheck) {
-        // Check In
         _checkInDate = DateFormat('EEE, MMM d, yyyy').format(DateTime.now());
         _checkInTime = DateFormat('hh:mm:ss a').format(DateTime.now());
         _workDuration = Duration.zero;
-
-        // Save to persistent storage
         _controller.checkIn();
-
-        _workTimer = Timer.periodic(
-          const Duration(seconds: 1),
-          (_) => setState(() => _workDuration += const Duration(seconds: 1)),
-        );
-
-        _checkController.recordCheck(
-          isCheckIn: true,
-          workDuration: _workDuration,
-          breakDuration: _breakDuration,
-          currentPosition: _currentPosition!,
-        );
+        secureController.checkIn();
+        _workTimer?.cancel();
+        _workTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+          if (mounted) {
+            setState(() => _workDuration += const Duration(seconds: 1));
+          }
+        });
+        if (_currentPosition != null) {
+          _checkController.recordCheck(
+            isCheckIn: true,
+            workDuration: _workDuration,
+            breakDuration: _breakDuration,
+            currentPosition: _currentPosition!,
+          );
+        }
       } else {
-        // Check Out
         _workTimer?.cancel();
         _checkOutTime = DateFormat('hh:mm:ss a').format(DateTime.now());
-
-        // Save to persistent storage
         _controller.checkOut();
-        // Clear break state on check-out
-        _controller.saveBreakState(false, Duration.zero);
-
-        _checkController.recordCheck(
-          isCheckIn: false,
-          workDuration: _workDuration,
-          breakDuration: _breakDuration,
-          currentPosition: _currentPosition!,
-          existingCheckInTime: _checkInTime,
-        );
+        secureController.checkOut();
+        _controller.saveBreakState(false, _breakDuration);
+        if (_currentPosition != null) {
+          _checkController.recordCheck(
+            isCheckIn: false,
+            workDuration: _workDuration,
+            breakDuration: _breakDuration,
+            currentPosition: _currentPosition!,
+            existingCheckInTime: _checkInTime,
+          );
+        }
       }
     });
   }
 
-  void _toggleBreak() {
+  Future<void> _toggleBreak() async {
     if (!_canCheckIn) {
       CustomSnackBar.show(
         title: "Error",
@@ -195,19 +193,31 @@ class _AttendanceScreenState extends State<AttendanceScreen>
       );
       return;
     }
+    if (!mounted) return;
+
+    final wasOnBreak = isOnBreak;
+    final currentStored = await _controller.getBreakDuration();
 
     setState(() => isOnBreak = !isOnBreak);
-    if (isOnBreak) {
-      _breakDuration = Duration.zero;
-      _breakTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-        setState(() => _breakDuration += const Duration(seconds: 1));
-      });
-    } else {
+
+    if (!wasOnBreak && isOnBreak) {
+      _breakDuration = currentStored;
+      _breakStartTime = DateTime.now().subtract(_breakDuration);
       _breakTimer?.cancel();
+      _breakTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+        if (mounted) {
+          setState(() {
+            _breakDuration = DateTime.now().difference(_breakStartTime!);
+          });
+        }
+      });
+    } else if (wasOnBreak && !isOnBreak) {
+      _breakTimer?.cancel();
+      final totalBreak = DateTime.now().difference(_breakStartTime!);
+      _breakDuration = totalBreak;
     }
 
-    // Save break state to persistent storage
-    _controller.saveBreakState(isOnBreak, _breakDuration);
+    await _controller.saveBreakState(isOnBreak, _breakDuration);
 
     if (_currentPosition != null && _checkInDate != null) {
       _checkController.recordBreak(
@@ -360,7 +370,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                               BoxShadow(
                                 color: Color(0xFF1565C0).withValues(alpha: 0.6),
                                 blurRadius: 15,
-                                offset: const Offset(0, 6),
+                                offset: Offset(0, 6),
                               ),
                             ],
                           ),
@@ -436,7 +446,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
                               BoxShadow(
                                 color: Colors.black.withValues(alpha: 0.25),
                                 blurRadius: 10,
-                                offset: const Offset(0, 4),
+                                offset: Offset(0, 4),
                               ),
                             ],
                           ),

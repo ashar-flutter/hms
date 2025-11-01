@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 
 class CustomBar extends StatelessWidget {
+  final String text;
   const CustomBar({
     super.key,
+    required this.text,
   });
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
       centerTitle: true,
-      title: const Text(
-        "Users",
+      title:  Text(
+        text,
         style: TextStyle(
           fontFamily: "bold",
           fontSize: 16,

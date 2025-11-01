@@ -8,6 +8,7 @@ class SecureStorageService {
   static const _keyFirstName = 'firstName';
   static const _keyLastName = 'lastName';
   static const _keyUid = 'uid';
+  static const _keyUserRole = 'userRole'; // 👈 New key
 
   // Save user login state
   static Future<void> saveLoginState(bool value) async {
@@ -44,7 +45,14 @@ class SecureStorageService {
     return await _storage.read(key: _keyUid);
   }
 
-  // Read states
+  static Future<void> saveUserRole(String role) async {
+    await _storage.write(key: _keyUserRole, value: role);
+  }
+
+  static Future<String?> getUserRole() async {
+    return await _storage.read(key: _keyUserRole);
+  }
+
   static Future<bool> isLoggedIn() async {
     final value = await _storage.read(key: _keyIsLoggedIn);
     return value == 'true';
@@ -55,7 +63,6 @@ class SecureStorageService {
     return value == 'true';
   }
 
-  // Clear data (for logout)
   static Future<void> clearAll() async {
     await _storage.deleteAll();
   }

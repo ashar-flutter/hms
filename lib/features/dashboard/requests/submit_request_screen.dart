@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hr_flow/features/dashboard/requests/request_status_screen.dart';
@@ -29,15 +30,16 @@ class SubmitRequestScreen extends StatefulWidget {
 
 class _SubmitRequestScreenState extends State<SubmitRequestScreen>
     with SingleTickerProviderStateMixin {
+  final RequestStatusController statusController =
+      Get.find<RequestStatusController>();
+  late UploadController uploadController;
+
   String selectedOption = "";
   late AnimationController _controller;
   late Animation<double> _animation;
   final TextEditingController _descController = TextEditingController();
   DateTime? fromDate;
   DateTime? toDate;
-
-  late RequestStatusController statusController;
-  late UploadController uploadController;
 
   @override
   void initState() {
@@ -47,7 +49,6 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
       duration: const Duration(milliseconds: 200),
     );
     _animation = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
-    statusController = Get.put(RequestStatusController(), permanent: true);
     uploadController = Get.put(UploadController());
   }
 
@@ -197,10 +198,9 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                       ),
                     ),
                   ),
-
                   const SizedBox(width: 10),
                   const Text(
-                    "For multiple day’s",
+                    "For multiple day's",
                     style: TextStyle(
                       fontFamily: "bold",
                       color: Colors.black,
@@ -233,7 +233,7 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                   color: Colors.white,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
+                      color: Colors.black.withOpacity(0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 3),
                     ),
@@ -266,7 +266,8 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                           if (picked != null) {
                             setState(() {
                               fromDate = picked;
-                              if (toDate != null && toDate!.isBefore(fromDate!)) {
+                              if (toDate != null &&
+                                  toDate!.isBefore(fromDate!)) {
                                 toDate = null;
                               }
                             });
@@ -304,7 +305,7 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                   color: Colors.white,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
+                      color: Colors.black.withOpacity(0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 3),
                     ),
@@ -369,7 +370,7 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                     color: Colors.white,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
+                        color: Colors.black.withOpacity(0.1),
                         blurRadius: 10,
                         offset: const Offset(0, 3),
                       ),
@@ -438,7 +439,7 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.5),
+              color: Colors.black.withOpacity(0.5),
               blurRadius: 40,
               spreadRadius: 6,
               offset: const Offset(0, 12),
@@ -457,6 +458,7 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                 borderRadius: BorderRadius.circular(28),
               ),
             ),
+
             onPressed: () {
               final file = uploadController.selectedFile.value;
               final isValid = ValidationHelper.validateForm(
@@ -468,18 +470,35 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
               );
 
               if (isValid) {
-                statusController.addRequest(
-                  RequestModel(
-                    category: widget.category,
-                    type: widget.type,
-                    reason: widget.reason,
-                    description: _descController.text.trim(),
-                    filePath: file?.path,
-                    fromDate: fromDate,
-                    toDate: toDate,
-                  ),
+                final newRequest = RequestModel(
+                  id: DateTime.now().millisecondsSinceEpoch.toString(),
+                  userId: statusController.getCurrentUserId(),
+                  userName: statusController.getCurrentUserName(),
+                  userEmail: statusController.getCurrentUserEmail(),
+                  userProfileImage: '',
+                  userRole: 'employee',
+                  userFirstName: '',
+                  userLastName: '', // ✅ NEW FIELD (Controller se fetch karenge)
+                  category: widget.category,
+                  type: widget.type,
+                  reason: widget.reason,
+                  description: _descController.text.trim(),
+                  filePath: file?.path,
+                  fromDate: fromDate,
+                  toDate: toDate,
+                  status: 'pending',
+                  createdAt: Timestamp.now(),
                 );
+
+                print('🚀 === SUBMITTING TO FIREBASE ===');
+                print('🚀 User: ${newRequest.userName} (${newRequest.userId})');
+                print('🚀 Email: ${newRequest.userEmail}');
+                print('🚀 Category: ${newRequest.category}');
+
+                statusController.addRequest(newRequest);
+
                 Get.offAll(() => RequestStatusScreen());
+
                 CustomSnackBar.show(
                   title: "Success",
                   message: "Request submitted successfully!",

@@ -181,6 +181,9 @@ class _ProfilePageState extends State<ProfilePage> {
     final last = lastCtr.text.trim();
     final role = roleCtr.text.trim();
 
+    // Debug print
+    print("Role selected: $role");
+
     final valid = await profileService.validation(
       context: context,
       name: name,
@@ -223,23 +226,28 @@ class _ProfilePageState extends State<ProfilePage> {
     );
 
     await SecureStorageService.saveProfileCompleted(true);
+    await SecureStorageService.saveUserRole(role);
 
     if (!mounted) return;
     await Future.delayed(const Duration(milliseconds: 600));
 
     if (!mounted) return;
-    if (role == 'admin') {
-      Navigator.pushReplacement(
+    if (role.toLowerCase() == 'admin') {
+      Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (_) => AdminDashboard()),
+        MaterialPageRoute(builder: (_) => AdminDashboard(
+          naame: name,
+          lNaame: last,
+        )),
+            (route) => false,
       );
     } else {
-      Navigator.pushReplacement(
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder: (_) =>
-              MainDashboard(firstname: nameCtr.text, lastname: lastCtr.text),
+          builder: (_) => MainDashboard(firstname: name, lastname: last),
         ),
+            (route) => false,
       );
     }
   }
@@ -327,6 +335,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
                     const SizedBox(height: 6),
+                    // Current dropdown code ko replace karein:
                     Padding(
                       padding: const EdgeInsets.only(left: 15, right: 15),
                       child: Container(
@@ -354,20 +363,22 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           items: <String>['admin', 'employee']
                               .map<DropdownMenuItem<String>>((String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(
-                                    value,
-                                    style: TextStyle(
-                                      fontFamily: "poppins",
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                );
-                              })
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(
+                                value,
+                                style: TextStyle(
+                                  fontFamily: "poppins",
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            );
+                          })
                               .toList(),
                           onChanged: (String? newValue) {
-                            roleCtr.text = newValue ?? '';
+                            setState(() {
+                              roleCtr.text = newValue ?? '';
+                            });
                           },
                           decoration: const InputDecoration(
                             border: InputBorder.none,

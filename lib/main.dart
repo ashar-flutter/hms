@@ -4,11 +4,10 @@ import 'package:get/get.dart';
 import 'package:hr_flow/features/splash/splash_screen.dart';
 
 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
-
   runApp(const MyApp());
 }
 

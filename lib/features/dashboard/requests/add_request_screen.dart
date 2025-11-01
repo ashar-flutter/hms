@@ -13,8 +13,7 @@ class AddRequestScreen extends StatefulWidget {
 }
 
 class _AddRequestScreenState extends State<AddRequestScreen> {
-  final controller = Get.put(RequestController());
-
+  final RequestController requestController = Get.put(RequestController());
   final List<String> categories = ["Leave Request"];
   final List<String> types = [
     "Sick Leave",
@@ -73,7 +72,7 @@ class _AddRequestScreenState extends State<AddRequestScreen> {
         ),
       ),
       body: Obx(
-        () => Column(
+            () => Column(
           children: [
             SizedBox(height: AppBar().preferredSize.height / 2),
             Padding(
@@ -104,9 +103,9 @@ class _AddRequestScreenState extends State<AddRequestScreen> {
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
-                  value: controller.selectedCategory?.value == ''
+                  value: requestController.selectedCategory?.value == ''
                       ? null
-                      : controller.selectedCategory?.value,
+                      : requestController.selectedCategory?.value,
                   hint: Text(
                     "Select Category",
                     style: TextStyle(
@@ -130,7 +129,7 @@ class _AddRequestScreenState extends State<AddRequestScreen> {
                     );
                   }).toList(),
                   onChanged: (value) {
-                    controller.selectedCategory?.value = value ?? '';
+                    requestController.selectedCategory?.value = value ?? '';
                   },
                 ),
               ),
@@ -164,9 +163,9 @@ class _AddRequestScreenState extends State<AddRequestScreen> {
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
-                  value: controller.selectedType?.value == ''
+                  value: requestController.selectedType?.value == ''
                       ? null
-                      : controller.selectedType?.value,
+                      : requestController.selectedType?.value,
                   hint: Text(
                     "Select Type",
                     style: TextStyle(
@@ -190,7 +189,7 @@ class _AddRequestScreenState extends State<AddRequestScreen> {
                     );
                   }).toList(),
                   onChanged: (value) {
-                    controller.selectedType?.value = value ?? '';
+                    requestController.selectedType?.value = value ?? '';
                   },
                 ),
               ),
@@ -224,9 +223,9 @@ class _AddRequestScreenState extends State<AddRequestScreen> {
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
-                  value: controller.selectedReason?.value == ''
+                  value: requestController.selectedReason?.value == ''
                       ? null
-                      : controller.selectedReason?.value,
+                      : requestController.selectedReason?.value,
                   hint: Text(
                     "Select Reason",
                     style: TextStyle(
@@ -250,7 +249,7 @@ class _AddRequestScreenState extends State<AddRequestScreen> {
                     );
                   }).toList(),
                   onChanged: (value) {
-                    controller.selectedReason?.value = value ?? '';
+                    requestController.selectedReason?.value = value ?? '';
                   },
                 ),
               ),
@@ -283,8 +282,8 @@ class _AddRequestScreenState extends State<AddRequestScreen> {
               ),
             ),
             onPressed: () {
-              if (controller.selectedCategory?.value == '' ||
-                  controller.selectedCategory?.value == null) {
+              if (requestController.selectedCategory?.value == '' ||
+                  requestController.selectedCategory?.value == null) {
                 CustomSnackBar.show(
                   title: "Error",
                   message: "Please select category",
@@ -296,8 +295,8 @@ class _AddRequestScreenState extends State<AddRequestScreen> {
                 );
                 return;
               }
-              if (controller.selectedType?.value == '' ||
-                  controller.selectedType?.value == null) {
+              if (requestController.selectedType?.value == '' ||
+                  requestController.selectedType?.value == null) {
                 CustomSnackBar.show(
                   title: "Error",
                   message: "Please select type",
@@ -309,8 +308,8 @@ class _AddRequestScreenState extends State<AddRequestScreen> {
                 );
                 return;
               }
-              if (controller.selectedReason?.value == '' ||
-                  controller.selectedReason?.value == null) {
+              if (requestController.selectedReason?.value == '' ||
+                  requestController.selectedReason?.value == null) {
                 CustomSnackBar.show(
                   title: "Error",
                   message: "Please select reason",
@@ -323,10 +322,10 @@ class _AddRequestScreenState extends State<AddRequestScreen> {
                 return;
               }
               Get.to(
-                SubmitRequestScreen(
-                  category: controller.selectedCategory!.value,
-                  type: controller.selectedType!.value,
-                  reason: controller.selectedReason!.value,
+                    () => SubmitRequestScreen(
+                  category: requestController.selectedCategory!.value,
+                  type: requestController.selectedType!.value,
+                  reason: requestController.selectedReason!.value,
                 ),
               );
             },
