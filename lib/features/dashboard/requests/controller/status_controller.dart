@@ -15,22 +15,20 @@ class RequestStatusController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    print('🎯 Firebase RequestStatusController CREATED: ${this.hashCode}');
     _loadRequestsFromFirebase();
   }
-
   void _loadRequestsFromFirebase() {
     _firestore.collection(_collectionName)
         .orderBy('createdAt', descending: true)
         .snapshots()
         .listen((snapshot) {
       requests.value = snapshot.docs.map((doc) {
+        print('🔄 New request received: ${doc.data()['userName']}');
         return RequestModel.fromJson(doc.data());
       }).toList();
-      print('📂 Loaded ${requests.length} requests from Firebase');
+      print('📂 Total requests: ${requests.length}');
     });
   }
-
   String getCurrentUserId() {
     return _auth.currentUser?.uid ?? 'unknown_user';
   }
@@ -45,13 +43,15 @@ class RequestStatusController extends GetxController {
 
   Future<Map<String, dynamic>?> getUserProfileData(String userId) async {
     try {
-      final doc = await _firestore.collection(_usersCollection).doc(userId).get();
+      final doc = await _firestore
+          .collection(_usersCollection)
+          .doc(userId)
+          .get();
       if (doc.exists) {
         return doc.data();
       }
       return null;
     } catch (e) {
-      print('❌ Error fetching user profile: $e');
       return null;
     }
   }
@@ -67,40 +67,39 @@ class RequestStatusController extends GetxController {
         'userRole': userProfile?['role'] ?? 'employee',
         'userFirstName': userProfile?['firstName'] ?? '',
         'userLastName': userProfile?['lastName'] ?? '',
+        'fileName': request.fileName,
+        'fileData': request.fileData,
         'createdAt': FieldValue.serverTimestamp(),
       };
 
-      await _firestore.collection(_collectionName).doc(request.id).set(requestData);
-      print('✅ Request saved to Firebase with profile data: ${request.id}');
-    } catch (e) {
-      print('❌ Error saving to Firebase: $e');
-    }
+      await _firestore
+          .collection(_collectionName)
+          .doc(request.id)
+          .set(requestData);
+    } catch (e) {}
   }
 
   List<RequestModel> getAllRequests() {
-    print('👑 ADMIN VIEW - Total requests: ${requests.length}');
     return requests;
   }
 
   List<RequestModel> getCurrentUserRequests() {
     final userId = getCurrentUserId();
-    final userRequests = requests.where((request) => request.userId == userId).toList();
-    print('📱 USER VIEW - User $userId requests: ${userRequests.length}');
+    final userRequests = requests
+        .where((request) => request.userId == userId)
+        .toList();
     return userRequests;
   }
 
-  // ✅ APPROVE REQUEST WITH NOTIFICATION
   Future<void> approveRequest(String requestId) async {
     try {
       final request = requests.firstWhere((r) => r.id == requestId);
 
-      // ✅ REQUEST UPDATE KARO
       await _firestore.collection(_collectionName).doc(requestId).update({
         'status': 'approved',
         'updatedAt': FieldValue.serverTimestamp(),
       });
 
-      // ✅ NOTIFICATION CREATE KARO
       await _createNotification(
         userId: request.userId,
         title: 'Leave Request Approved ✅',
@@ -108,14 +107,9 @@ class RequestStatusController extends GetxController {
         type: 'approval',
         requestId: requestId,
       );
-
-      print('✅ Request APPROVED and notification sent to user: ${request.userId}');
-    } catch (e) {
-      print('❌ Error approving request: $e');
-    }
+    } catch (e) {}
   }
 
-  // ✅ REJECT REQUEST WITH NOTIFICATION
   Future<void> rejectRequest(String requestId) async {
     try {
       final request = requests.firstWhere((r) => r.id == requestId);
@@ -125,7 +119,6 @@ class RequestStatusController extends GetxController {
         'updatedAt': FieldValue.serverTimestamp(),
       });
 
-      // ✅ NOTIFICATION CREATE KARO
       await _createNotification(
         userId: request.userId,
         title: 'Leave Request Rejected ❌',
@@ -133,14 +126,9 @@ class RequestStatusController extends GetxController {
         type: 'rejection',
         requestId: requestId,
       );
-
-      print('❌ Request REJECTED and notification sent to user: ${request.userId}');
-    } catch (e) {
-      print('❌ Error rejecting request: $e');
-    }
+    } catch (e) {}
   }
 
-  // ✅ NOTIFICATION CREATE KARO
   Future<void> _createNotification({
     required String userId,
     required String title,
@@ -162,11 +150,10 @@ class RequestStatusController extends GetxController {
         'createdAt': FieldValue.serverTimestamp(),
       };
 
-      await _firestore.collection(_notificationsCollection).doc(notificationId).set(notificationData);
-
-      print('🔔 Notification created for user: $userId - $title');
-    } catch (e) {
-      print('❌ Error creating notification: $e');
-    }
+      await _firestore
+          .collection(_notificationsCollection)
+          .doc(notificationId)
+          .set(notificationData);
+    } catch (e) {}
   }
 }

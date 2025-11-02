@@ -3,22 +3,21 @@ import 'package:get/get.dart';
 import 'dart:convert';
 import 'package:hr_flow/features/dashboard/requests/controller/status_controller.dart';
 import 'package:hr_flow/features/dashboard/requests/model/request_model.dart';
+import '../../services/file_open_service.dart';
 
 class AdminRequestsScreen extends StatelessWidget {
   final RequestStatusController controller = Get.find<RequestStatusController>();
+  final FileOpenService fileOpenService = FileOpenService();
 
   @override
   Widget build(BuildContext context) {
-    print('🛠️ AdminRequestsScreen using controller: ${controller.hashCode}');
-    print('🛠️ Current requests count: ${controller.requests.length}');
-
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70),
         child: AppBar(
           leading: IconButton(
             onPressed: () => Get.back(),
-            icon: const Icon(size: 20, Icons.arrow_back),
+            icon: const Icon(size: 19, Icons.arrow_back),
           ),
           centerTitle: true,
           title: const Text(
@@ -40,11 +39,11 @@ class AdminRequestsScreen extends StatelessWidget {
       body: Obx(() {
         final allRequests = controller.getAllRequests();
 
-        print('🔄 AdminRequestsScreen - Requests: ${allRequests.length}');
-
         for (var i = 0; i < allRequests.length; i++) {
           final request = allRequests[i];
-          print('📋 Request $i: ${request.userFirstName} ${request.userLastName} | ${request.category} | Status: ${request.status}');
+          print(
+            '📋 Request $i: ${request.userFirstName} ${request.userLastName} | ${request.category} | Status: ${request.status}',
+          );
         }
 
         if (allRequests.isEmpty) {
@@ -114,13 +113,19 @@ class AdminRequestsScreen extends StatelessWidget {
                     color: Colors.blue.shade50,
                     image: request.userProfileImage != null
                         ? DecorationImage(
-                      image: MemoryImage(base64Decode(request.userProfileImage!)),
+                      image: MemoryImage(
+                        base64Decode(request.userProfileImage!),
+                      ),
                       fit: BoxFit.cover,
                     )
                         : null,
                   ),
                   child: request.userProfileImage == null
-                      ? Icon(Icons.person, size: 20, color: Colors.blue.shade700)
+                      ? Icon(
+                    Icons.person,
+                    size: 20,
+                    color: Colors.blue.shade700,
+                  )
                       : null,
                 ),
                 const SizedBox(width: 12),
@@ -129,7 +134,8 @@ class AdminRequestsScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${request.userFirstName} ${request.userLastName}'.trim(),
+                        '${request.userFirstName} ${request.userLastName}'
+                            .trim(),
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -160,7 +166,10 @@ class AdminRequestsScreen extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: statusColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
@@ -226,7 +235,11 @@ class AdminRequestsScreen extends StatelessWidget {
               const SizedBox(height: 8),
               Row(
                 children: [
-                  Icon(Icons.attach_file, size: 16, color: Colors.blue.shade700),
+                  Icon(
+                    Icons.attach_file,
+                    size: 16,
+                    color: Colors.blue.shade700,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     "Attached File:",
@@ -241,7 +254,7 @@ class AdminRequestsScreen extends StatelessWidget {
               const SizedBox(height: 8),
               GestureDetector(
                 onTap: () {
-                  _viewAttachedFile(request.filePath!);
+                  _openFile(request.filePath!, request.fileName, request.fileData);
                 },
                 child: Container(
                   padding: const EdgeInsets.all(12),
@@ -263,7 +276,7 @@ class AdminRequestsScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              _getFileName(request.filePath!),
+                              fileOpenService.getFileName(request.filePath!),
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
@@ -390,64 +403,35 @@ class AdminRequestsScreen extends StatelessWidget {
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
             ),
           ),
         ],
       ),
     );
   }
-
-  String _getFileName(String filePath) {
-    try {
-      return filePath.split('/').last;
-    } catch (e) {
-      return 'Attached File';
-    }
-  }
-
-  void _viewAttachedFile(String filePath) {
-    print('📁 Opening file: $filePath');
-
-    Get.snackbar(
-      'File Attachment',
-      'File: ${_getFileName(filePath)}',
-      backgroundColor: Colors.blue,
-      colorText: Colors.white,
-      snackPosition: SnackPosition.BOTTOM,
-      mainButton: TextButton(
-        onPressed: () {
-          _openFile(filePath);
-        },
-        child: Text(
-          'OPEN',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+  void _openFile(String filePath, String? fileName, String? fileData) async {
+    Get.dialog(
+      AlertDialog(
+        title: Text("File Info"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("File: ${fileOpenService.getFileName(filePath)}"),
+            SizedBox(height: 10),
+            Text("Path: $filePath"),
+            SizedBox(height: 10),
+            Text("Status: File saved locally"),
+          ],
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text("OK"),
+          ),
+        ],
       ),
     );
-  }
-
-  void _openFile(String filePath) async {
-    try {
-      print('🔗 Opening file: $filePath');
-
-      Get.snackbar(
-        'File Opened',
-        'Opening file: ${_getFileName(filePath)}',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
-    } catch (e) {
-      print('❌ Error opening file: $e');
-      Get.snackbar(
-        'Error',
-        'Could not open file: ${_getFileName(filePath)}',
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-    }
   }
 }

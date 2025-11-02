@@ -74,24 +74,26 @@ class HomeDashboard extends StatelessWidget {
                       color: Color(0xFFE9E9E9),
                       border: Border.all(
                         color: Colors.amber,
-                        width: 1.2
+                        width: 1
                       )
                     ),
-                    child: IconButton(
-                      icon: Icon(
-                          size: 26,
-                          Icons.notifications, color: Colors.black),
-                      onPressed: () {
-                        Get.to(
-                          () => NotificationsScreen(),
-                        );
-                      },
+                    child: Center(
+                      child: IconButton(
+                        icon: Icon(
+                            size: 26,
+                            Icons.notifications, color: Colors.black),
+                        onPressed: () {
+                          Get.to(
+                            () => NotificationsScreen(),
+                          );
+                        },
+                      ),
                     ),
                   ),
                   if (notificationController.unreadCount.value > 0)
                     Positioned(
-                      right: 1,
-                      top: 10,
+                      right: -2,
+                      top: 8,
                       child: Container(
                         padding: EdgeInsets.all(2),
                         decoration: BoxDecoration(

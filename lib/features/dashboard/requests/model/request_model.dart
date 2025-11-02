@@ -14,6 +14,8 @@ class RequestModel {
   final String reason;
   final String description;
   final String? filePath;
+  final String? fileName;
+  final String? fileData;
   final DateTime? fromDate;
   final DateTime? toDate;
   final String status;
@@ -34,6 +36,8 @@ class RequestModel {
     required this.reason,
     required this.description,
     this.filePath,
+    this.fileName,
+    this.fileData,
     this.fromDate,
     this.toDate,
     this.status = 'pending',
@@ -56,6 +60,8 @@ class RequestModel {
       'reason': reason,
       'description': description,
       'filePath': filePath,
+      'fileName': fileName,
+      'fileData': fileData,
       'fromDate': fromDate?.millisecondsSinceEpoch,
       'toDate': toDate?.millisecondsSinceEpoch,
       'status': status,
@@ -79,8 +85,14 @@ class RequestModel {
       reason: json['reason'],
       description: json['description'],
       filePath: json['filePath'],
-      fromDate: json['fromDate'] != null ? DateTime.fromMillisecondsSinceEpoch(json['fromDate']) : null,
-      toDate: json['toDate'] != null ? DateTime.fromMillisecondsSinceEpoch(json['toDate']) : null,
+      fileName: json['fileName'],
+      fileData: json['fileData'],
+      fromDate: json['fromDate'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(json['fromDate'])
+          : null,
+      toDate: json['toDate'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(json['toDate'])
+          : null,
       status: json['status'] ?? 'pending',
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],

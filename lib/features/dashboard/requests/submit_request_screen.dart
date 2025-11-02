@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -439,7 +441,7 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.5),
+              color: Colors.black.withValues(alpha: 0.5),
               blurRadius: 40,
               spreadRadius: 6,
               offset: const Offset(0, 12),
@@ -458,8 +460,7 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                 borderRadius: BorderRadius.circular(28),
               ),
             ),
-
-            onPressed: () {
+            onPressed: () async {
               final file = uploadController.selectedFile.value;
               final isValid = ValidationHelper.validateForm(
                 selectedOption: selectedOption,
@@ -470,6 +471,15 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
               );
 
               if (isValid) {
+                String? fileName;
+                String? fileData;
+
+                if (file != null) {
+                  final bytes = await file.readAsBytes();
+                  fileData = base64Encode(bytes);
+                  fileName = file.path.split('/').last;
+                }
+
                 final newRequest = RequestModel(
                   id: DateTime.now().millisecondsSinceEpoch.toString(),
                   userId: statusController.getCurrentUserId(),
@@ -478,12 +488,14 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                   userProfileImage: '',
                   userRole: 'employee',
                   userFirstName: '',
-                  userLastName: '', // ✅ NEW FIELD (Controller se fetch karenge)
+                  userLastName: '',
                   category: widget.category,
                   type: widget.type,
                   reason: widget.reason,
                   description: _descController.text.trim(),
                   filePath: file?.path,
+                  fileName: fileName,
+                  fileData: fileData,
                   fromDate: fromDate,
                   toDate: toDate,
                   status: 'pending',
