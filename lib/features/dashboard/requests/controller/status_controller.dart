@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert';
 import '../model/request_model.dart';
 
 class RequestStatusController extends GetxController {
@@ -17,6 +18,7 @@ class RequestStatusController extends GetxController {
     super.onInit();
     _loadRequestsFromFirebase();
   }
+
   void _loadRequestsFromFirebase() {
     _firestore.collection(_collectionName)
         .orderBy('createdAt', descending: true)
@@ -29,6 +31,7 @@ class RequestStatusController extends GetxController {
       print('📂 Total requests: ${requests.length}');
     });
   }
+
   String getCurrentUserId() {
     return _auth.currentUser?.uid ?? 'unknown_user';
   }
@@ -60,15 +63,86 @@ class RequestStatusController extends GetxController {
     try {
       final userProfile = await getUserProfileData(request.userId);
 
-      final requestData = {
-        ...request.toJson(),
+      String? safeFileData = request.fileData;
+      if (safeFileData != null && safeFileData.length > 300000) {
+        print('⚠️ File data too large: ${safeFileData.length} bytes, truncating...');
+        safeFileData = null;
+      }
+
+      // ✅ PEHLE SIMPLE MAP BANAO BINA FieldValue KE
+      Map<String, dynamic> simpleData = {
+        'id': request.id,
+        'userId': request.userId,
+        'userName': request.userName,
         'userEmail': userProfile?['email'] ?? getCurrentUserEmail(),
         'userProfileImage': userProfile?['profileImage'],
         'userRole': userProfile?['role'] ?? 'employee',
         'userFirstName': userProfile?['firstName'] ?? '',
         'userLastName': userProfile?['lastName'] ?? '',
+        'category': request.category,
+        'type': request.type,
+        'reason': request.reason,
+        'description': request.description,
+        'filePath': request.filePath,
         'fileName': request.fileName,
-        'fileData': request.fileData,
+        'fileData': safeFileData,
+        'fromDate': request.fromDate?.millisecondsSinceEpoch,
+        'toDate': request.toDate?.millisecondsSinceEpoch,
+        'status': request.status,
+        'createdAt': DateTime.now().millisecondsSinceEpoch, // ✅ Timestamp ki jagah milliseconds
+      };
+
+      // ✅ SIZE CHECK
+      final jsonString = jsonEncode(simpleData);
+      if (jsonString.length > 1000000) {
+        print('❌ Request too large: ${jsonString.length} bytes, removing file data');
+        simpleData['fileData'] = null;
+        simpleData['fileName'] = null;
+      }
+
+      // ✅ AB FIRESTORE MEIN SAVE KARO WITH FieldValue
+      final firestoreData = {
+        ...simpleData,
+        'createdAt': FieldValue.serverTimestamp(), // ✅ Yahan FieldValue use karo
+      };
+
+      await _firestore
+          .collection(_collectionName)
+          .doc(request.id)
+          .set(firestoreData);
+
+      print('✅ Request saved successfully: ${request.id}');
+    } catch (e) {
+      print('❌ Error saving request: $e');
+      if (e.toString().contains('exceeds the maximum allowed size')) {
+        await _saveWithoutFileData(request);
+      }
+    }
+  }
+
+  Future<void> _saveWithoutFileData(RequestModel request) async {
+    try {
+      final userProfile = await getUserProfileData(request.userId);
+
+      final requestData = {
+        'id': request.id,
+        'userId': request.userId,
+        'userName': request.userName,
+        'userEmail': userProfile?['email'] ?? getCurrentUserEmail(),
+        'userProfileImage': userProfile?['profileImage'],
+        'userRole': userProfile?['role'] ?? 'employee',
+        'userFirstName': userProfile?['firstName'] ?? '',
+        'userLastName': userProfile?['lastName'] ?? '',
+        'category': request.category,
+        'type': request.type,
+        'reason': request.reason,
+        'description': request.description,
+        'filePath': null,
+        'fileName': null,
+        'fileData': null,
+        'fromDate': request.fromDate?.millisecondsSinceEpoch,
+        'toDate': request.toDate?.millisecondsSinceEpoch,
+        'status': request.status,
         'createdAt': FieldValue.serverTimestamp(),
       };
 
@@ -76,7 +150,11 @@ class RequestStatusController extends GetxController {
           .collection(_collectionName)
           .doc(request.id)
           .set(requestData);
-    } catch (e) {}
+
+      print('✅ Request saved without file data: ${request.id}');
+    } catch (e) {
+      print('❌ Error saving without file data: $e');
+    }
   }
 
   List<RequestModel> getAllRequests() {

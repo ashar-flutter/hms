@@ -6,8 +6,7 @@ import 'package:hr_flow/features/dashboard/documents/widgets/doc_attach_box.dart
 import 'package:hr_flow/features/dashboard/documents/widgets/doc_field.dart';
 import 'package:hr_flow/features/dashboard/documents/widgets/doc_type_field.dart';
 import 'package:image_picker/image_picker.dart';
-
-import '../utils/snakbar_helper.dart';
+import '../service/document_service.dart';
 
 class NewDocumentPage extends StatefulWidget {
   const NewDocumentPage({super.key});
@@ -17,10 +16,12 @@ class NewDocumentPage extends StatefulWidget {
 }
 
 class _NewDocumentPageState extends State<NewDocumentPage> {
+  final DocumentService documentService = DocumentService();
   final TextEditingController docNameController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
   String? selectedType;
   XFile? attachedFile;
+  bool _isSubmitting = false;
 
   @override
   void dispose() {
@@ -29,38 +30,55 @@ class _NewDocumentPageState extends State<NewDocumentPage> {
     super.dispose();
   }
 
-  void _onSave() {
-    if (docNameController.text.trim().isEmpty) {
-      SnackbarHelper.showError(context, "Please enter document name");
-      return;
-    }
+  void _onSave() async {
+    if (_isSubmitting) return;
 
-    if (selectedType == null || selectedType!.isEmpty) {
-      SnackbarHelper.showError(context, "Please select document type");
-      return;
-    }
+    if (docNameController.text.trim().isEmpty) return;
+    if (selectedType == null || selectedType!.isEmpty) return;
+    if (dateController.text.trim().isEmpty) return;
+    if (attachedFile == null) return;
 
-    if (dateController.text.trim().isEmpty) {
-      SnackbarHelper.showError(context, "Please select expiry date");
-      return;
-    }
+    setState(() {
+      _isSubmitting = true;
+    });
 
-    if (attachedFile == null) {
-      SnackbarHelper.showError(context, "Please attach a file");
-      return;
-    }
+    try {
+      await documentService.submitDocument(
+        docName: docNameController.text.trim(),
+        docType: selectedType!,
+        expiryDate: dateController.text.trim(),
+        fileName: attachedFile!.name,
+        filePath: attachedFile!.path,
+      );
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => ShowDataPage(
+      showDialog(
+        context: context,
+        barrierColor: Colors.black.withOpacity(0.5),
+        barrierDismissible: false,
+        builder: (context) => ShowDataDialog(
           docName: docNameController.text.trim(),
           docType: selectedType!,
           expiryDate: dateController.text.trim(),
           fileName: attachedFile!.name,
         ),
-      ),
-    );
+      ).then((_) {
+        _clearForm();
+        Get.back();
+      });
+
+    } catch (e) {
+    } finally {
+      setState(() {
+        _isSubmitting = false;
+      });
+    }
+  }
+
+  void _clearForm() {
+    docNameController.clear();
+    dateController.clear();
+    selectedType = null;
+    attachedFile = null;
   }
 
   @override
@@ -70,9 +88,7 @@ class _NewDocumentPageState extends State<NewDocumentPage> {
         preferredSize: const Size.fromHeight(70),
         child: AppBar(
           leading: IconButton(
-            onPressed: () {
-              Get.back();
-            },
+            onPressed: () => Get.back(),
             icon: const Icon(size: 20, Icons.arrow_back),
           ),
           centerTitle: true,
@@ -182,7 +198,7 @@ class _NewDocumentPageState extends State<NewDocumentPage> {
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.5),
+              color: Colors.black.withOpacity(0.5),
               blurRadius: 40,
               spreadRadius: 6,
               offset: const Offset(0, 12),
@@ -196,13 +212,22 @@ class _NewDocumentPageState extends State<NewDocumentPage> {
           height: 55,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF6A11CB),
+              backgroundColor: _isSubmitting ? Colors.grey : const Color(0xFF6A11CB),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(28),
               ),
             ),
-            onPressed: _onSave,
-            child: const Text(
+            onPressed: _isSubmitting ? null : _onSave,
+            child: _isSubmitting
+                ? SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            )
+                : const Text(
               "Save",
               style: TextStyle(
                 fontFamily: "bold",

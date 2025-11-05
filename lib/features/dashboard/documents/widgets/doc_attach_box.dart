@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+
 class DocAttachBox extends StatefulWidget {
   final ValueChanged<XFile?>? onFilePicked;
   const DocAttachBox({super.key, this.onFilePicked});
@@ -11,14 +12,31 @@ class DocAttachBox extends StatefulWidget {
 class _DocAttachBoxState extends State<DocAttachBox> {
   XFile? selectedFile;
   final ImagePicker _picker = ImagePicker();
+  bool _isPicking = false;
 
   Future<void> _pickImage() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
+    if (_isPicking) return;
+
+    setState(() {
+      _isPicking = true;
+    });
+
+    try {
+      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+      if (image != null) {
+        setState(() {
+          selectedFile = image;
+        });
+        if (widget.onFilePicked != null) {
+          widget.onFilePicked!(image);
+        }
+      }
+    } catch (e) {
+      print('File pick error: $e');
+    } finally {
       setState(() {
-        selectedFile = image;
+        _isPicking = false;
       });
-      if (widget.onFilePicked != null) widget.onFilePicked!(image);
     }
   }
 
@@ -68,16 +86,24 @@ class _DocAttachBoxState extends State<DocAttachBox> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: _pickImage,
+                onPressed: _isPicking ? null : _pickImage,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF00008B),
+                  backgroundColor: _isPicking ? Colors.grey : const Color(0xFF00008B),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
-                  padding:
-                  const EdgeInsets.symmetric(horizontal: 30, vertical: 14),
+                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 14),
                 ),
-                child: const Text(
+                child: _isPicking
+                    ? SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+                    : const Text(
                   "Upload file",
                   style: TextStyle(
                     color: Colors.white,

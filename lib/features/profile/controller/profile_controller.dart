@@ -34,4 +34,7 @@ class ProfileController {
   Future<Map<String, dynamic>?> fetchProfile() async {
     return await _service.getProfile();
   }
+  Future<Map<String, dynamic>?> getCurrentUserProfile() async {
+    return await _service.getProfile();
+  }
 }

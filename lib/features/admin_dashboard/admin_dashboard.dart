@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hr_flow/features/admin_dashboard/screens/admin_profile/admin_profile_screen.dart';
 import 'package:hr_flow/features/admin_dashboard/screens/chats/employee_chat.dart';
 import 'package:hr_flow/features/admin_dashboard/screens/main_admin_dashboard.dart';
 
@@ -30,7 +31,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       ),
       EmployeeChat(),
       const Center(child: Text("Reports Section")),
-      const Center(child: Text("Admin Profile")),
+      AdminProfileScreen()
     ];
   }
 

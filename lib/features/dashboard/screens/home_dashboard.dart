@@ -8,6 +8,7 @@ import 'package:hr_flow/features/dashboard/screens/attendance_card.dart';
 import 'package:hr_flow/features/dashboard/screens/custom_card.dart';
 import 'package:get/get.dart';
 import 'package:hr_flow/features/dashboard/screens/request_notification_screen.dart';
+import '../documents/service/user_document_status_service.dart';
 import '../requests/controller/notification_controller.dart';
 
 class HomeDashboard extends StatelessWidget {
@@ -15,8 +16,13 @@ class HomeDashboard extends StatelessWidget {
   final String lName;
 
   HomeDashboard({super.key, required this.fName, required this.lName});
-  final NotificationController notificationController =
-      Get.find<NotificationController>();
+
+  final NotificationController notificationController = Get.put(
+    NotificationController(),
+  );
+  final UserDocumentStatusService documentStatusService = Get.put(
+    UserDocumentStatusService(),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -71,21 +77,18 @@ class HomeDashboard extends StatelessWidget {
                     width: 40,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15),
-                      color: Color(0xFFE9E9E9),
-                      border: Border.all(
-                        color: Colors.amber,
-                        width: 1
-                      )
+                      color: const Color(0xFFE9E9E9),
+                      border: Border.all(color: Colors.amber, width: 1),
                     ),
                     child: Center(
                       child: IconButton(
-                        icon: Icon(
-                            size: 26,
-                            Icons.notifications, color: Colors.black),
+                        icon: const Icon(
+                          size: 26,
+                          Icons.notifications,
+                          color: Colors.black,
+                        ),
                         onPressed: () {
-                          Get.to(
-                            () => NotificationsScreen(),
-                          );
+                          Get.to(() => NotificationsScreen());
                         },
                       ),
                     ),
@@ -95,18 +98,18 @@ class HomeDashboard extends StatelessWidget {
                       right: -2,
                       top: 8,
                       child: Container(
-                        padding: EdgeInsets.all(2),
+                        padding: const EdgeInsets.all(2),
                         decoration: BoxDecoration(
                           color: Colors.red,
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        constraints: BoxConstraints(
+                        constraints: const BoxConstraints(
                           minWidth: 18,
                           minHeight: 18,
                         ),
                         child: Text(
                           '${notificationController.unreadCount.value}',
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
@@ -118,7 +121,7 @@ class HomeDashboard extends StatelessWidget {
                 ],
               ),
             ),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
           ],
         ),
       ),
@@ -127,7 +130,7 @@ class HomeDashboard extends StatelessWidget {
           child: Column(
             children: [
               SizedBox(height: AppBar().preferredSize.height / 2),
-              AttendanceCard(),
+              const AttendanceCard(),
               SizedBox(height: AppBar().preferredSize.height / 2),
               const Padding(
                 padding: EdgeInsets.only(left: 15),
@@ -157,16 +160,50 @@ class HomeDashboard extends StatelessWidget {
                     text: "Requests",
                     imagePath: "assets/dashboard/requests.png",
                   ),
-                  CustomCard(
-                    onTap: () {
-                      Get.to(() => MainDocumentPage());
-                    },
-                    text: "Documents",
-                    imagePath: "assets/dashboard/documents.png",
-                  ),
+                  Obx(() {
+                    final responseCount = documentStatusService.responseCount.value;
+                    return Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        CustomCard(
+                          onTap: () {
+                            Get.to(() => MainDocumentPage());
+                          },
+                          text: "Documents",
+                          imagePath: "assets/dashboard/documents.png",
+                        ),
+                        if (responseCount > 0)
+                          Positioned(
+                            top: 8,
+                            right: 8,
+                            child: Container(
+                              padding: const EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.white, width: 2),
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 18,
+                                minHeight: 18,
+                              ),
+                              child: Text(
+                                responseCount > 9 ? '9+' : responseCount.toString(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  }),
                 ],
               ),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [

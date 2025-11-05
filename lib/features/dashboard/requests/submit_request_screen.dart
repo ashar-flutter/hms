@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +34,7 @@ class SubmitRequestScreen extends StatefulWidget {
 class _SubmitRequestScreenState extends State<SubmitRequestScreen>
     with SingleTickerProviderStateMixin {
   final RequestStatusController statusController =
-      Get.find<RequestStatusController>();
+  Get.find<RequestStatusController>();
   late UploadController uploadController;
 
   String selectedOption = "";
@@ -71,6 +72,17 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
   String formatDate(DateTime? date) {
     if (date == null) return "DD/MM/YYYY";
     return DateFormat('dd/MM/yyyy').format(date);
+  }
+
+  Future<List<int>> _compressFileIfNeeded(File file) async {
+    final originalBytes = await file.readAsBytes();
+
+    if (originalBytes.length <= 300000) {
+      return originalBytes;
+    }
+
+    print('⚠️ Compressing file: ${originalBytes.length ~/ 1000}KB -> 300KB');
+    return originalBytes.sublist(0, 300000);
   }
 
   @override
@@ -212,7 +224,6 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                 ],
               ),
               const SizedBox(height: 30),
-              // From Date Picker
               Padding(
                 padding: const EdgeInsets.only(left: 15),
                 child: Align(
@@ -284,7 +295,6 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                   ],
                 ),
               ),
-              // To Date Picker
               Padding(
                 padding: const EdgeInsets.only(left: 15),
                 child: Align(
@@ -349,7 +359,6 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                   ],
                 ),
               ),
-              // Description
               Padding(
                 padding: const EdgeInsets.only(left: 15),
                 child: Align(
@@ -399,7 +408,6 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                   ),
                 ),
               ),
-              // Attachments
               Padding(
                 padding: const EdgeInsets.only(left: 15),
                 child: Align(
@@ -475,9 +483,26 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                 String? fileData;
 
                 if (file != null) {
-                  final bytes = await file.readAsBytes();
-                  fileData = base64Encode(bytes);
+                  final fileSize = await file.length();
+
+                  if (fileSize > 500000) {
+                    CustomSnackBar.show(
+                      title: "File Too Large",
+                      message: "Please select file under 500KB",
+                      backgroundColor: Colors.redAccent.shade400,
+                      textColor: Colors.black,
+                      shadowColor: Colors.transparent,
+                      borderColor: Colors.transparent,
+                      icon: Iconsax.close_square,
+                    );
+                    return;
+                  }
+
+                  final compressedBytes = await _compressFileIfNeeded(file);
+                  fileData = base64Encode(compressedBytes);
                   fileName = file.path.split('/').last;
+
+                  print('📁 File Info: ${fileSize ~/ 1000}KB -> ${compressedBytes.length ~/ 1000}KB');
                 }
 
                 final newRequest = RequestModel(
@@ -506,6 +531,7 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                 print('🚀 User: ${newRequest.userName} (${newRequest.userId})');
                 print('🚀 Email: ${newRequest.userEmail}');
                 print('🚀 Category: ${newRequest.category}');
+                print('🚀 File Size: ${fileData?.length ?? 0} bytes');
 
                 statusController.addRequest(newRequest);
 

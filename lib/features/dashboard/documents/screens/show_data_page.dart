@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
-class ShowDataPage extends StatelessWidget {
+import '../../main_dashboard.dart';
+
+class ShowDataDialog extends StatelessWidget {
   final String docName;
   final String docType;
   final String expiryDate;
   final String fileName;
 
-  const ShowDataPage({
+  const ShowDataDialog({
     super.key,
     required this.docName,
     required this.docType,
@@ -16,102 +18,182 @@ class ShowDataPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: const Text(
-          "Document Details",
-          style: TextStyle(
-            fontSize: 16,
-            fontFamily: "bold",
-            color: Colors.black,
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.all(20),
+      child: _buildDialogContent(context),
+    );
+  }
+
+  Widget _buildDialogContent(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(30),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.15),
+            blurRadius: 25,
+            spreadRadius: 2,
+            offset: const Offset(0, 10),
           ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(bottom: Radius.circular(40)),
-        ),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(40)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black26,
-                blurRadius: 20,
-                offset: Offset(0, 10),
-              ),
-            ],
-          ),
-        ),
+        ],
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Card(
-            elevation: 10,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(25),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Document Summary",
-                    style: TextStyle(
-                      fontFamily: "bold",
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  _buildDetail("Document Name", docName),
-                  _buildDetail("Document Type", docType),
-                  _buildDetail("Expiry Date", expiryDate),
-                  _buildDetail("File", fileName),
-                ],
-              ),
-            ),
-          ),
-        ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          _buildHeader(),
+          const SizedBox(height: 25),
+
+          // Data Container
+          _buildDataContainer(),
+          const SizedBox(height: 25),
+
+          // Done Button
+          _buildDoneButton(context),
+        ],
       ),
     );
   }
 
-  Widget _buildDetail(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
+  Widget _buildHeader() {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.green.withValues(alpha: 0.1),
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(
+            Icons.check_circle_rounded,
+            color: Colors.green,
+            size: 28,
+          ),
+        ),
+        const SizedBox(width: 15),
+        const Expanded(
+          child: Text(
+            "Document Submitted Successfully!",
+            style: TextStyle(
+              fontFamily: "bold",
+              fontSize: 18,
+              color: Colors.black87,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDataContainer() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.grey.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(
+          color: Colors.grey.withValues(alpha: 0.2),
+          width: 1,
+        ),
+      ),
+      child: Column(
         children: [
-          Expanded(
-            flex: 3,
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontFamily: "bold",
-                fontSize: 14,
-              ),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            flex: 5,
-            child: Text(
-              value,
-              style: TextStyle(
-                fontFamily: "poppins",
-                fontSize: 14,
-                color: Colors.black87,
-              ),
-            ),
-          ),
+          _buildDataRow("Document Name", docName),
+          const SizedBox(height: 12),
+          _buildDataRow("Document Type", docType),
+          const SizedBox(height: 12),
+          _buildDataRow("Expiry Date", expiryDate),
+          const SizedBox(height: 12),
+          _buildDataRow("Attached File", fileName),
         ],
+      ),
+    );
+  }
+
+  Widget _buildDataRow(String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 100,
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontFamily: "bold",
+              color: Colors.black54,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        const Text(":", style: TextStyle(color: Colors.black54, fontSize: 14)),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(
+              color: Colors.black87,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDoneButton(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 55,
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.of(context).pop();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (_) => MainDashboard(firstname: '', lastname: ''),
+              ),
+                  (route) => false,
+            );
+          });
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          padding: EdgeInsets.zero,
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+            ),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: const Center(
+            child: Text(
+              "DONE",
+              style: TextStyle(
+                fontFamily: "bold",
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

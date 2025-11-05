@@ -65,12 +65,34 @@ class RequestModel {
       'fromDate': fromDate?.millisecondsSinceEpoch,
       'toDate': toDate?.millisecondsSinceEpoch,
       'status': status,
-      'createdAt': createdAt,
-      'updatedAt': updatedAt,
+      'createdAt': createdAt?.millisecondsSinceEpoch ?? DateTime.now().millisecondsSinceEpoch,
+      'updatedAt': updatedAt?.millisecondsSinceEpoch,
     };
   }
 
   factory RequestModel.fromJson(Map<String, dynamic> json) {
+    // ✅ FILE DATA SIZE CHECK - 300KB SE BARA NAHI HONA CHAHIYE
+    String? fileData = json['fileData'];
+    if (fileData != null && fileData.length > 300000) {
+      print('⚠️ File data too large in model: ${fileData.length} bytes');
+      fileData = null;
+    }
+
+    // ✅ TIMESTAMP HANDLING
+    Timestamp? createdAt;
+    if (json['createdAt'] is Timestamp) {
+      createdAt = json['createdAt'];
+    } else if (json['createdAt'] is int) {
+      createdAt = Timestamp.fromMillisecondsSinceEpoch(json['createdAt']);
+    }
+
+    Timestamp? updatedAt;
+    if (json['updatedAt'] is Timestamp) {
+      updatedAt = json['updatedAt'];
+    } else if (json['updatedAt'] is int) {
+      updatedAt = Timestamp.fromMillisecondsSinceEpoch(json['updatedAt']);
+    }
+
     return RequestModel(
       id: json['id'],
       userId: json['userId'],
@@ -86,7 +108,7 @@ class RequestModel {
       description: json['description'],
       filePath: json['filePath'],
       fileName: json['fileName'],
-      fileData: json['fileData'],
+      fileData: fileData,
       fromDate: json['fromDate'] != null
           ? DateTime.fromMillisecondsSinceEpoch(json['fromDate'])
           : null,
@@ -94,8 +116,8 @@ class RequestModel {
           ? DateTime.fromMillisecondsSinceEpoch(json['toDate'])
           : null,
       status: json['status'] ?? 'pending',
-      createdAt: json['createdAt'],
-      updatedAt: json['updatedAt'],
+      createdAt: createdAt,
+      updatedAt: updatedAt,
     );
   }
 

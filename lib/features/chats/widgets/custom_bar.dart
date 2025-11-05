@@ -15,7 +15,7 @@ class CustomBar extends StatelessWidget {
         text,
         style: TextStyle(
           fontFamily: "bold",
-          fontSize: 16,
+          fontSize: 15,
           fontWeight: FontWeight.bold,
           color: Colors.black,
         ),
