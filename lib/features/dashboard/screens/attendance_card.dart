@@ -11,11 +11,33 @@ class AttendanceCard extends StatelessWidget {
     final controller = Get.put(SecureAttendanceController(), permanent: true);
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
+      margin: const EdgeInsets.symmetric(horizontal: 15),
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
-        color: const Color(0xFF5038ED),
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFF5038ED),
+            Color(0xFF38ED7D),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 20,
+            spreadRadius: 2,
+            offset: Offset(0, 8),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 10,
+            spreadRadius: 1,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -47,8 +69,6 @@ class AttendanceCard extends StatelessWidget {
               ),
             ],
           ),
-
-          // Better layout for times
           Obx(() {
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -128,6 +148,13 @@ class AttendanceCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
                     color: const Color(0xFFFFFFFF),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 8,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
                   ),
                   child: Center(
                     child: Text(
@@ -153,6 +180,13 @@ class AttendanceCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(15),
                   color: const Color(0xFFFFFFFF),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 8,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
                 ),
                 child: const Center(
                   child: Text(

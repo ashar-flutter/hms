@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hr_flow/features/admin_dashboard/all_components/dashboard_card.dart';
@@ -6,7 +5,10 @@ import 'package:hr_flow/features/admin_dashboard/screens/employee/employee_list.
 import 'package:hr_flow/features/admin_dashboard/screens/employee_documents/employee_documents.dart';
 import '../../chats/widgets/custom_bar.dart';
 import '../../dashboard/documents/service/document_count_service.dart';
+import '../all_components/refresh_tab.dart';
 import '../services/request_count_service.dart';
+import 'active_user/controllers/admin_attendance_controller.dart';
+import 'active_user/screens/active_employees_screen.dart';
 import 'get_request/admin_requests_screen.dart';
 
 class MainAdminDashboard extends StatefulWidget {
@@ -25,32 +27,16 @@ class MainAdminDashboard extends StatefulWidget {
 class _MainAdminDashboardState extends State<MainAdminDashboard> {
   final RequestCountService countService = Get.put(RequestCountService());
   final DocumentCountService docCountService = Get.put(DocumentCountService());
+  final AdminAttendanceController attendanceController = Get.put(
+    AdminAttendanceController(),
+  );
 
-  void _debugAdminCheck() async {
-    print('=== ADMIN DEBUG START ===');
-
-    final pendingDocs = await FirebaseFirestore.instance
-        .collection('documents')
-        .where('status', isEqualTo: 'pending')
-        .get();
-    print('Admin Pending documents: ${pendingDocs.docs.length}');
-
-    for (var doc in pendingDocs.docs) {
-      print('Pending Doc: ${doc.data()}');
-    }
-
-    print('=== ADMIN DEBUG END ===');
-  }
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       countService.refreshCount();
-
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        countService.refreshCount();
-        _debugAdminCheck();
-      });
+      attendanceController.refreshData();
     });
   }
 
@@ -59,58 +45,119 @@ class _MainAdminDashboardState extends State<MainAdminDashboard> {
     Get.to(() => AdminRequestsScreen());
   }
 
+  void _navigateToActiveEmployees() {
+    Get.to(() => ActiveEmployeesScreen());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70),
-        child: CustomBar(text: "Welcome ${widget.name}${widget.lName}"),
+        child: CustomBar(text: "Welcome ${widget.name} ${widget.lName}"),
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             SizedBox(height: AppBar().preferredSize.height / 2),
+            Container(
+              height: 100,
+              width: 100,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(
+                  image: AssetImage("assets/dashboard/company.jfif"),
+                  fit: BoxFit.cover,
+                  filterQuality: FilterQuality.high,
+                ),
+              ),
+            ),
+            SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.only(left: 15),
               child: Align(
-                alignment: Alignment.topLeft,
+                alignment: Alignment.center,
                 child: Text(
-                  "Dashboard!",
+                  "LA Digital Agency!",
                   style: TextStyle(
                     fontSize: 18,
                     color: Colors.black,
                     fontFamily: "bold",
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 15),
-              child: Align(
-                alignment: Alignment.topLeft,
-                child: Text(
-                  "Welcome back! Here's your overview for today!",
-                  style: TextStyle(fontSize: 14, color: Colors.black),
+            SizedBox(height: 5),
+            Align(
+              alignment: Alignment.center,
+              child: Text(
+                "Welcome back! Here's your overview for today!",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
+
             SizedBox(height: AppBar().preferredSize.height / 2),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 DashboardCard(
-                  isPress: () {
-                    Get.to(() => EmployeeList());
-                  },
-                  title: " total employees",
-                  icon: const Icon(Icons.person_2, color: Colors.white),
-                  color: const Color(0xFF1E3A8A),
+                  onTap: () => Get.to(() => EmployeeList()),
+                  text: "Employees",
+                  imagePath: "assets/dashboard/attendance.png",
                 ),
-                DashboardCard(
-                  title: "Active Today",
-                  icon: const Icon(Icons.verified_user, color: Colors.white),
-                  color: const Color(0xFF00FF00),
-                ),
+                Obx(() {
+                  final activeCount =
+                      attendanceController.activeEmployeesCount.value;
+                  return Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      DashboardCard(
+                        onTap: _navigateToActiveEmployees,
+                        text: "Active Today",
+                        imagePath: "assets/dashboard/attendance.png",
+                      ),
+                      if (activeCount > 0)
+                        Positioned(
+                          top: -5,
+                          right: -5,
+                          child: GestureDetector(
+                            onTap: _navigateToActiveEmployees,
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 2,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black26,
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Text(
+                                activeCount > 9 ? '9+' : activeCount.toString(),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                }),
               ],
             ),
             SizedBox(height: AppBar().preferredSize.height / 2),
@@ -124,105 +171,91 @@ class _MainAdminDashboardState extends State<MainAdminDashboard> {
                     clipBehavior: Clip.none,
                     children: [
                       DashboardCard(
-                        isPress: _navigateToRequests,
-                        title: "Requests",
-                        icon: const Icon(
-                          Icons.history_outlined,
-                          color: Colors.white,
-                        ),
-                        color: const Color(0xFFFF8C00),
+                        onTap: _navigateToRequests,
+                        text: "Requests",
+                        imagePath: "assets/dashboard/requests.png",
                       ),
                       if (pendingCount > 0)
                         Positioned(
-                          top: -5,
-                          right: -5,
+                          top: 8,
+                          right: 8,
                           child: Container(
-                            padding: const EdgeInsets.all(8),
+                            padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
-                              color: shouldShow ? Colors.red : Colors.orange,
+                              color: shouldShow ? Colors.red : Colors.red,
                               shape: BoxShape.circle,
                               border: Border.all(color: Colors.white, width: 2),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black26,
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
+                            ),
+                            constraints: const BoxConstraints(
+                              minWidth: 20,
+                              minHeight: 20,
                             ),
                             child: Text(
                               pendingCount > 9 ? '9+' : pendingCount.toString(),
                               style: const TextStyle(
                                 color: Colors.white,
-                                fontSize: 12,
+                                fontSize: 10,
                                 fontWeight: FontWeight.bold,
                               ),
+                              textAlign: TextAlign.center,
                             ),
                           ),
                         ),
                     ],
                   );
                 }),
-                DashboardCard(
-                  title: "Leave today",
-                  icon: const Icon(Icons.error_outline, color: Colors.white),
-                  color: const Color(0xFF8B0000),
-                ),
+
+                Obx(() {
+                  final docPendingCount = docCountService.pendingCount.value;
+                  return Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      DashboardCard(
+                        onTap: () => Get.to(() => EmployeeDocuments()),
+                        text: "Documents",
+                        imagePath: "assets/dashboard/documents.png",
+                      ),
+                      if (docPendingCount > 0)
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 2),
+                            ),
+                            constraints: const BoxConstraints(
+                              minWidth: 20,
+                              minHeight: 20,
+                            ),
+                            child: Text(
+                              docPendingCount > 9
+                                  ? '9+'
+                                  : docPendingCount.toString(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                }),
               ],
             ),
-            const SizedBox(height: 20),Obx(() {
-              final docPendingCount = docCountService.pendingCount.value;
-              return Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  DashboardCard(
-                    onTap: () {
-                      Get.to(() => EmployeeDocuments());
-                    },
-                    title: "Documents",
-                    icon: const Icon(Icons.file_copy_outlined, color: Colors.white),
-                    color: const Color(0xFF87CEEB),
-                  ),
-                  if (docPendingCount > 0)
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
-                        ),
-                        constraints: const BoxConstraints(
-                          minWidth: 20,
-                          minHeight: 20,
-                        ),
-                        child: Text(
-                          docPendingCount > 9 ? '9+' : docPendingCount.toString(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                ],
-              );
-            }),
-            SizedBox(height: AppBar().preferredSize.height / 2),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          countService.refreshCount();
-
+      floatingActionButton: RefreshFab(
+        onRefresh: () async {
+          await countService.refreshCount();
+          await attendanceController.refreshData();
         },
-        backgroundColor: Colors.amberAccent,
-        child: const Icon(Icons.refresh),
       ),
     );
   }

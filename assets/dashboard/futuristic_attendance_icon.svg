@@ -1,0 +1,84 @@
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradient for clipboard base -->
+    <linearGradient id="clipboardGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667EEA;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#5568D3;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4C51BF;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Gradient for paper -->
+    <linearGradient id="paperGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#F7FAFC;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#EDF2F7;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Gradient for clip -->
+    <linearGradient id="clipGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#48BB78;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#38A169;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Glow effect -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Shadow -->
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="3" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Main shadow -->
+  <ellipse cx="60" cy="105" rx="35" ry="8" fill="#000000" opacity="0.2"/>
+  
+  <!-- Clipboard base with 3D effect -->
+  <path d="M 30 25 L 30 100 Q 30 105 35 105 L 85 105 Q 90 105 90 100 L 90 25 Q 90 20 85 20 L 35 20 Q 30 20 30 25 Z" 
+        fill="url(#clipboardGradient)" filter="url(#shadow)" stroke="#3C366B" stroke-width="2"/>
+  
+  <!-- 3D depth edge -->
+  <path d="M 32 25 L 32 100 Q 32 103 34 103" fill="none" stroke="#7C8ADB" stroke-width="2" opacity="0.6"/>
+  
+  <!-- Clip holder top -->
+  <rect x="45" y="15" width="30" height="12" rx="3" fill="url(#clipGradient)" filter="url(#shadow)" stroke="#2F855A" stroke-width="1.5"/>
+  
+  <!-- Clip metallic shine -->
+  <rect x="47" y="16" width="26" height="4" rx="2" fill="#68D391" opacity="0.5"/>
+  
+  <!-- Paper sheet with 3D effect -->
+  <rect x="38" y="32" width="44" height="60" rx="2" fill="url(#paperGradient)" stroke="#CBD5E0" stroke-width="1.5"/>
+  
+  <!-- Paper highlight -->
+  <line x1="39" y1="35" x2="39" y2="90" stroke="#FFFFFF" stroke-width="1.5" opacity="0.6"/>
+  
+  <!-- Checkmarks with glow effect -->
+  <g filter="url(#glow)">
+    <!-- Checkmark 1 -->
+    <circle cx="45" cy="45" r="4" fill="#48BB78" opacity="0.2"/>
+    <path d="M 43 45 L 45 47 L 48 43" fill="none" stroke="#48BB78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- Checkmark 2 -->
+    <circle cx="45" cy="58" r="4" fill="#48BB78" opacity="0.2"/>
+    <path d="M 43 58 L 45 60 L 48 56" fill="none" stroke="#48BB78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- Checkmark 3 -->
+    <circle cx="45" cy="71" r="4" fill="#48BB78" opacity="0.2"/>
+    <path d="M 43 71 L 45 73 L 48 69" fill="none" stroke="#48BB78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  
+  <!-- Text lines -->
+  <line x1="53" y1="45" x2="75" y2="45" stroke="#A0AEC0" stroke-width="2" stroke-linecap="round"/>
+  <line x1="53" y1="58" x2="75" y2="58" stroke="#A0AEC0" stroke-width="2" stroke-linecap="round"/>
+  <line x1="53" y1="71" x2="75" y2="71" stroke="#A0AEC0" stroke-width="2" stroke-linecap="round"/>
+  <line x1="53" y1="84" x2="68" y2="84" stroke="#CBD5E0" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Futuristic digital indicator -->
+  <circle cx="75" cy="35" r="6" fill="#667EEA" opacity="0.3" filter="url(#glow)"/>
+  <circle cx="75" cy="35" r="3" fill="#48BB78" filter="url(#glow)"/>
+</svg>

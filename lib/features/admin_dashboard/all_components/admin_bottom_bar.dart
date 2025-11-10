@@ -37,8 +37,15 @@ class AdminBottomBar extends StatelessWidget {
               ),
               boxShadow: [
                 BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.2),
+                  blurRadius: 25,
+                  spreadRadius: 2,
+                  offset: const Offset(0, -5),
+                ),
+                BoxShadow(
                   color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 19,
+                  blurRadius: 10,
+                  spreadRadius: 1,
                   offset: const Offset(0, -2),
                 ),
               ],

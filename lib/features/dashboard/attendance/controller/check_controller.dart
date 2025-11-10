@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
-
 import '../service/check_service.dart';
 
 class CheckController extends ChangeNotifier {

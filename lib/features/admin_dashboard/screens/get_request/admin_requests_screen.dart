@@ -3,11 +3,16 @@ import 'package:get/get.dart';
 import 'dart:convert';
 import 'package:hr_flow/features/dashboard/requests/controller/status_controller.dart';
 import 'package:hr_flow/features/dashboard/requests/model/request_model.dart';
+import 'package:iconsax/iconsax.dart';
+import '../../../../core/snackbar/custom_snackbar.dart';
 import '../../services/file_open_service.dart';
 
 class AdminRequestsScreen extends StatelessWidget {
-  final RequestStatusController controller = Get.find<RequestStatusController>();
+  final RequestStatusController controller = Get.put(RequestStatusController());
+
   final FileOpenService fileOpenService = FileOpenService();
+
+  AdminRequestsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,9 +26,9 @@ class AdminRequestsScreen extends StatelessWidget {
           ),
           centerTitle: true,
           title: const Text(
-            "All Requests - Admin",
+            "All Requests",
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 15,
               fontFamily: "bold",
               fontWeight: FontWeight.bold,
               color: Colors.black,
@@ -39,23 +44,20 @@ class AdminRequestsScreen extends StatelessWidget {
       body: Obx(() {
         final allRequests = controller.getAllRequests();
 
-        for (var i = 0; i < allRequests.length; i++) {
-          final request = allRequests[i];
-          print(
-            '📋 Request $i: ${request.userFirstName} ${request.userLastName} | ${request.category} | Status: ${request.status}',
-          );
-        }
-
         if (allRequests.isEmpty) {
           return const Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.inbox_outlined, size: 64, color: Colors.grey),
+                Icon(Icons.inbox_outlined, size: 50, color: Colors.grey),
                 SizedBox(height: 16),
                 Text(
                   "No requests submitted yet",
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey,
+                    fontFamily: "bold",
+                  ),
                 ),
               ],
             ),
@@ -63,9 +65,7 @@ class AdminRequestsScreen extends StatelessWidget {
         }
 
         return RefreshIndicator(
-          onRefresh: () async {
-            print('🔄 Refreshing admin requests...');
-          },
+          onRefresh: () async {},
           child: ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: allRequests.length,
@@ -113,19 +113,19 @@ class AdminRequestsScreen extends StatelessWidget {
                     color: Colors.blue.shade50,
                     image: request.userProfileImage != null
                         ? DecorationImage(
-                      image: MemoryImage(
-                        base64Decode(request.userProfileImage!),
-                      ),
-                      fit: BoxFit.cover,
-                    )
+                            image: MemoryImage(
+                              base64Decode(request.userProfileImage!),
+                            ),
+                            fit: BoxFit.cover,
+                          )
                         : null,
                   ),
                   child: request.userProfileImage == null
                       ? Icon(
-                    Icons.person,
-                    size: 20,
-                    color: Colors.blue.shade700,
-                  )
+                          Icons.person,
+                          size: 20,
+                          color: Colors.blue.shade700,
+                        )
                       : null,
                 ),
                 const SizedBox(width: 12),
@@ -254,7 +254,11 @@ class AdminRequestsScreen extends StatelessWidget {
               const SizedBox(height: 8),
               GestureDetector(
                 onTap: () {
-                  _openFile(request.filePath!, request.fileName, request.fileData);
+                  _openFile(
+                    request.filePath!,
+                    request.fileName,
+                    request.fileData,
+                  );
                 },
                 child: Container(
                   padding: const EdgeInsets.all(12),
@@ -313,14 +317,20 @@ class AdminRequestsScreen extends StatelessWidget {
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        print('✅ Approving request: ${request.id}');
                         controller.approveRequest(request.id);
-                        Get.snackbar(
-                          'Approved',
-                          'Request has been approved',
-                          backgroundColor: Colors.green,
-                          colorText: Colors.white,
-                          snackPosition: SnackPosition.BOTTOM,
+                        CustomSnackBar.show(
+                          title: "Approved",
+                          message: "Request has been approved",
+                          backgroundColor: const Color.fromARGB(
+                            255,
+                            0,
+                            122,
+                            255,
+                          ),
+                          textColor: Colors.black,
+                          shadowColor: Colors.lightBlueAccent,
+                          borderColor: Colors.transparent,
+                          icon: Iconsax.message_tick,
                         );
                       },
                       icon: const Icon(Icons.check, size: 18),
@@ -339,14 +349,15 @@ class AdminRequestsScreen extends StatelessWidget {
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        print('❌ Rejecting request: ${request.id}');
                         controller.rejectRequest(request.id);
-                        Get.snackbar(
-                          'Rejected',
-                          'Request has been rejected',
-                          backgroundColor: Colors.red,
-                          colorText: Colors.white,
-                          snackPosition: SnackPosition.BOTTOM,
+                        CustomSnackBar.show(
+                          title: "Rejection",
+                          message: "request has been rejected",
+                          backgroundColor: Colors.redAccent.shade400,
+                          textColor: Colors.black,
+                          shadowColor: Colors.transparent,
+                          borderColor: Colors.transparent,
+                          icon: Iconsax.close_square,
                         );
                       },
                       icon: const Icon(Icons.close, size: 18),
@@ -410,6 +421,7 @@ class AdminRequestsScreen extends StatelessWidget {
       ),
     );
   }
+
   void _openFile(String filePath, String? fileName, String? fileData) async {
     Get.dialog(
       AlertDialog(
@@ -425,12 +437,7 @@ class AdminRequestsScreen extends StatelessWidget {
             Text("Status: File saved locally"),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: Text("OK"),
-          ),
-        ],
+        actions: [TextButton(onPressed: () => Get.back(), child: Text("OK"))],
       ),
     );
   }

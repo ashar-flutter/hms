@@ -97,11 +97,11 @@ class SecureAttendanceController extends GetxController {
     return "$h:$m:$s";
   }
 
-  // Pakistan time format - 12 hour with AM/PM
+
   String formatDateTime(DateTime? dt) {
     if (dt == null) return "--:--:--";
 
-    // Pakistan time format: 03:45:25 PM
+
     final formatter = DateFormat('hh:mm:ss a');
     return formatter.format(dt);
   }

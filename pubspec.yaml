@@ -54,6 +54,7 @@ dependencies:
   firebase_messaging:
   flutter_local_notifications:
   audioplayers: ^6.5.1
+  flutter_svg:
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -88,6 +89,12 @@ flutter:
      - assets/dashboard/reports.png
      - assets/dashboard/requests.png
      - assets/dashboard/document.png
+     - assets/dashboard/company.jfif
+     - assets/dashboard/heavy_document_icon.svg
+     - assets/dashboard/futuristic_attendance_icon.svg
+     - assets/dashboard/futuristic_calendar_icon.svg
+     - assets/dashboard/futuristic_leave_icon.svg
+     - assets/dashboard/futuristic_reports_icon.svg
 #     - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

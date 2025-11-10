@@ -1,0 +1,190 @@
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradient for calendar body -->
+    <linearGradient id="calendarBodyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667EEA;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#5568D3;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4C51BF;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Gradient for header -->
+    <linearGradient id="headerGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#9F7AEA;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#805AD5;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Gradient for page -->
+    <linearGradient id="pageGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#FAF5FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E9D8FD;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Gradient for rings -->
+    <linearGradient id="ringGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#D6BCFA;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#B794F4;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Glow effect -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Strong glow -->
+    <filter id="strongGlow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Shadow -->
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-opacity="0.45"/>
+    </filter>
+    
+    <!-- Inner shadow -->
+    <filter id="innerShadow">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+      <feOffset dx="0" dy="2" result="offsetblur"/>
+      <feFlood flood-color="#000000" flood-opacity="0.3"/>
+      <feComposite in2="offsetblur" operator="in"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Main shadow -->
+  <ellipse cx="60" cy="110" rx="48" ry="9" fill="#000000" opacity="0.3"/>
+  
+  <!-- Calendar main body with heavy 3D effect -->
+  <rect x="18" y="25" width="84" height="80" rx="8" 
+        fill="url(#calendarBodyGradient)" filter="url(#shadow)" stroke="#3C366B" stroke-width="3.5"/>
+  
+  <!-- 3D depth edges - left side -->
+  <path d="M 21 32 L 21 98 Q 21 102 24 102" fill="none" stroke="#805AD5" stroke-width="3" opacity="0.7"/>
+  
+  <!-- 3D depth edges - right side -->
+  <path d="M 99 32 L 99 98 Q 99 102 96 102" fill="none" stroke="#3C366B" stroke-width="2" opacity="0.5"/>
+  
+  <!-- Header bar with gradient -->
+  <rect x="18" y="25" width="84" height="20" rx="8" 
+        fill="url(#headerGradient)" opacity="0.9"/>
+  
+  <!-- Binding rings with 3D effect -->
+  <g filter="url(#shadow)">
+    <!-- Ring 1 -->
+    <ellipse cx="35" cy="25" rx="5" ry="6" fill="url(#ringGradient)" stroke="#6B46C1" stroke-width="2"/>
+    <ellipse cx="35" cy="24" rx="3" ry="2" fill="#D6BCFA" opacity="0.6"/>
+    
+    <!-- Ring 2 -->
+    <ellipse cx="60" cy="25" rx="5" ry="6" fill="url(#ringGradient)" stroke="#6B46C1" stroke-width="2"/>
+    <ellipse cx="60" cy="24" rx="3" ry="2" fill="#D6BCFA" opacity="0.6"/>
+    
+    <!-- Ring 3 -->
+    <ellipse cx="85" cy="25" rx="5" ry="6" fill="url(#ringGradient)" stroke="#6B46C1" stroke-width="2"/>
+    <ellipse cx="85" cy="24" rx="3" ry="2" fill="#D6BCFA" opacity="0.6"/>
+  </g>
+  
+  <!-- Calendar page/grid area -->
+  <rect x="23" y="48" width="74" height="52" rx="4" 
+        fill="url(#pageGradient)" stroke="#B794F4" stroke-width="2" filter="url(#innerShadow)"/>
+  
+  <!-- Page highlight for 3D effect -->
+  <line x1="24" y1="52" x2="24" y2="96" stroke="#FFFFFF" stroke-width="2.5" opacity="0.7"/>
+  
+  <!-- Day labels at top (subtle) -->
+  <g opacity="0.6">
+    <text x="30" y="58" font-family="Arial, sans-serif" font-size="5" font-weight="bold" fill="#5568D3">S</text>
+    <text x="40" y="58" font-family="Arial, sans-serif" font-size="5" font-weight="bold" fill="#5568D3">M</text>
+    <text x="50" y="58" font-family="Arial, sans-serif" font-size="5" font-weight="bold" fill="#5568D3">T</text>
+    <text x="60" y="58" font-family="Arial, sans-serif" font-size="5" font-weight="bold" fill="#5568D3">W</text>
+    <text x="70" y="58" font-family="Arial, sans-serif" font-size="5" font-weight="bold" fill="#5568D3">T</text>
+    <text x="80" y="58" font-family="Arial, sans-serif" font-size="5" font-weight="bold" fill="#5568D3">F</text>
+    <text x="90" y="58" font-family="Arial, sans-serif" font-size="5" font-weight="bold" fill="#5568D3">S</text>
+  </g>
+  
+  <!-- Calendar date grid with 3D cells -->
+  <g filter="url(#glow)">
+    <!-- Week 1 -->
+    <rect x="28" y="63" width="8" height="7" rx="1.5" fill="#E9D8FD" opacity="0.4"/>
+    <rect x="38" y="63" width="8" height="7" rx="1.5" fill="#E9D8FD" opacity="0.4"/>
+    <rect x="48" y="63" width="8" height="7" rx="1.5" fill="#E9D8FD" opacity="0.4"/>
+    <rect x="58" y="63" width="8" height="7" rx="1.5" fill="#E9D8FD" opacity="0.4"/>
+    <rect x="68" y="63" width="8" height="7" rx="1.5" fill="#E9D8FD" opacity="0.4"/>
+    <rect x="78" y="63" width="8" height="7" rx="1.5" fill="#E9D8FD" opacity="0.4"/>
+    <rect x="88" y="63" width="8" height="7" rx="1.5" fill="#E9D8FD" opacity="0.4"/>
+    
+    <!-- Week 2 -->
+    <rect x="28" y="72" width="8" height="7" rx="1.5" fill="#E9D8FD" opacity="0.4"/>
+    <rect x="38" y="72" width="8" height="7" rx="1.5" fill="#E9D8FD" opacity="0.4"/>
+    <rect x="48" y="72" width="8" height="7" rx="1.5" fill="#E9D8FD" opacity="0.4"/>
+    <rect x="58" y="72" width="8" height="7" rx="1.5" fill="#E9D8FD" opacity="0.4"/>
+    <rect x="68" y="72" width="8" height="7" rx="1.5" fill="#E9D8FD" opacity="0.4"/>
+    <rect x="78" y="72" width="8" height="7" rx="1.5" fill="#E9D8FD" opacity="0.4"/>
+    <rect x="88" y="72" width="8" height="7" rx="1.5" fill="#E9D8FD" opacity="0.4"/>
+    
+    <!-- Week 3 -->
+    <rect x="28" y="81" width="8" height="7" rx="1.5" fill="#E9D8FD" opacity="0.4"/>
+    <rect x="38" y="81" width="8" height="7" rx="1.5" fill="#E9D8FD" opacity="0.4"/>
+    <rect x="48" y="81" width="8" height="7" rx="1.5" fill="#E9D8FD" opacity="0.4"/>
+    <rect x="58" y="81" width="8" height="7" rx="1.5" fill="#E9D8FD" opacity="0.4"/>
+    <rect x="68" y="81" width="8" height="7" rx="1.5" fill="#E9D8FD" opacity="0.4"/>
+    <rect x="78" y="81" width="8" height="7" rx="1.5" fill="#E9D8FD" opacity="0.4"/>
+    <rect x="88" y="81" width="8" height="7" rx="1.5" fill="#E9D8FD" opacity="0.4"/>
+    
+    <!-- Week 4 -->
+    <rect x="28" y="90" width="8" height="7" rx="1.5" fill="#E9D8FD" opacity="0.4"/>
+    <rect x="38" y="90" width="8" height="7" rx="1.5" fill="#E9D8FD" opacity="0.4"/>
+    <rect x="48" y="90" width="8" height="7" rx="1.5" fill="#E9D8FD" opacity="0.4"/>
+    <rect x="58" y="90" width="8" height="7" rx="1.5" fill="#E9D8FD" opacity="0.4"/>
+  </g>
+  
+  <!-- Highlighted today date with strong glow -->
+  <g filter="url(#strongGlow)">
+    <rect x="58" y="72" width="8" height="7" rx="1.5" fill="#667EEA" opacity="0.8"/>
+    <circle cx="62" cy="75.5" r="4" fill="#667EEA" opacity="0.3"/>
+    <text x="60" y="77" font-family="Arial, sans-serif" font-size="5" font-weight="bold" fill="#FFFFFF">15</text>
+  </g>
+  
+  <!-- Sample date numbers (few visible ones) -->
+  <g opacity="0.7">
+    <text x="30" y="69" font-family="Arial, sans-serif" font-size="4.5" fill="#5568D3">1</text>
+    <text x="40" y="69" font-family="Arial, sans-serif" font-size="4.5" fill="#5568D3">2</text>
+    <text x="50" y="69" font-family="Arial, sans-serif" font-size="4.5" fill="#5568D3">3</text>
+    <text x="70" y="69" font-family="Arial, sans-serif" font-size="4.5" fill="#5568D3">5</text>
+    
+    <text x="30" y="78" font-family="Arial, sans-serif" font-size="4.5" fill="#5568D3">8</text>
+    <text x="40" y="78" font-family="Arial, sans-serif" font-size="4.5" fill="#5568D3">9</text>
+    <text x="80" y="78" font-family="Arial, sans-serif" font-size="4.5" fill="#5568D3">12</text>
+  </g>
+  
+  <!-- Digital status indicators -->
+  <g filter="url(#strongGlow)">
+    <!-- Left notification dot -->
+    <circle cx="27" cy="38" r="3" fill="#48BB78" opacity="0.3"/>
+    <circle cx="27" cy="38" r="1.5" fill="#48BB78"/>
+    
+    <!-- Right notification dot -->
+    <circle cx="93" cy="38" r="3" fill="#4299E1" opacity="0.3"/>
+    <circle cx="93" cy="38" r="1.5" fill="#4299E1"/>
+  </g>
+  
+  <!-- Futuristic corner accents -->
+  <g opacity="0.6">
+    <path d="M 95 50 L 97 50 L 97 52" fill="none" stroke="#B794F4" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M 23 98 L 23 96 L 25 96" fill="none" stroke="#B794F4" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Holographic shine on top -->
+  <path d="M 25 48 L 35 48 Q 45 50 55 48 L 70 48" fill="none" stroke="#FFFFFF" 
+        stroke-width="2" opacity="0.25" stroke-linecap="round"/>
+</svg>

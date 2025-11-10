@@ -4,9 +4,10 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hr_flow/features/dashboard/requests/request_status_screen.dart';
+import 'package:hr_flow/features/dashboard/requests/request_submitted_dialog.dart';
 import 'package:iconsax/iconsax.dart';
 import '../../../core/snackbar/custom_snackbar.dart';
+import '../main_dashboard.dart';
 import 'controller/status_controller.dart';
 import 'controller/upload_controller.dart';
 import 'helper/dotted_box.dart';
@@ -34,7 +35,7 @@ class SubmitRequestScreen extends StatefulWidget {
 class _SubmitRequestScreenState extends State<SubmitRequestScreen>
     with SingleTickerProviderStateMixin {
   final RequestStatusController statusController =
-  Get.find<RequestStatusController>();
+      Get.find<RequestStatusController>();
   late UploadController uploadController;
 
   String selectedOption = "";
@@ -62,6 +63,86 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
     super.dispose();
   }
 
+  void _submitRequest(File? file) async {
+    String? fileName;
+    String? fileData;
+
+    if (file != null) {
+      final fileSize = await file.length();
+
+      if (fileSize > 500000) {
+        if (!mounted) return;
+        CustomSnackBar.show(
+          title: "File Too Large",
+          message: "Please select file under 500KB",
+          backgroundColor: Colors.redAccent.shade400,
+          textColor: Colors.black,
+          shadowColor: Colors.transparent,
+          borderColor: Colors.transparent,
+          icon: Iconsax.close_square,
+        );
+        return;
+      }
+
+      final compressedBytes = await _compressFileIfNeeded(file);
+      fileData = base64Encode(compressedBytes);
+      fileName = file.path.split('/').last;
+    }
+
+    final newRequest = RequestModel(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      userId: statusController.getCurrentUserId(),
+      userName: statusController.getCurrentUserName(),
+      userEmail: statusController.getCurrentUserEmail(),
+      userProfileImage: '',
+      userRole: 'employee',
+      userFirstName: '',
+      userLastName: '',
+      category: widget.category,
+      type: widget.type,
+      reason: widget.reason,
+      description: _descController.text.trim(),
+      filePath: file?.path,
+      fileName: fileName,
+      fileData: fileData,
+      fromDate: fromDate,
+      toDate: toDate,
+      status: 'pending',
+      createdAt: Timestamp.now(),
+    );
+
+    statusController.addRequest(newRequest);
+
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.5),
+      barrierDismissible: false,
+      builder: (context) => RequestSubmittedDialog(
+        category: widget.category,
+        type: widget.type,
+        reason: widget.reason,
+        fromDate: fromDate,
+        toDate: toDate,
+        description: _descController.text.trim(),
+        fileName: fileName ?? 'No file attached',
+      ),
+    ).then((_) {
+      Get.offAll(() => MainDashboard(firstname: '', lastname: ''));
+    });
+
+    if (!mounted) return;
+    CustomSnackBar.show(
+      title: "Request Submitted",
+      message: "You'll get a response as soon as possible.",
+      backgroundColor: const Color.fromARGB(255, 0, 122, 255),
+      textColor: Colors.black,
+      shadowColor: Colors.lightBlueAccent,
+      borderColor: Colors.transparent,
+      icon: Iconsax.message_tick,
+    );
+  }
+
   void selectOption(String option) {
     setState(() {
       selectedOption = option;
@@ -81,7 +162,6 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
       return originalBytes;
     }
 
-    print('⚠️ Compressing file: ${originalBytes.length ~/ 1000}KB -> 300KB');
     return originalBytes.sublist(0, 300000);
   }
 
@@ -246,7 +326,7 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                   color: Colors.white,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 3),
                     ),
@@ -317,7 +397,7 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                   color: Colors.white,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 3),
                     ),
@@ -381,7 +461,7 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                     color: Colors.white,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 10,
                         offset: const Offset(0, 3),
                       ),
@@ -468,7 +548,7 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                 borderRadius: BorderRadius.circular(28),
               ),
             ),
-            onPressed: () async {
+            onPressed: () {
               final file = uploadController.selectedFile.value;
               final isValid = ValidationHelper.validateForm(
                 selectedOption: selectedOption,
@@ -478,75 +558,9 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                 file: file,
               );
 
-              if (isValid) {
-                String? fileName;
-                String? fileData;
+              if (!isValid) return;
 
-                if (file != null) {
-                  final fileSize = await file.length();
-
-                  if (fileSize > 500000) {
-                    CustomSnackBar.show(
-                      title: "File Too Large",
-                      message: "Please select file under 500KB",
-                      backgroundColor: Colors.redAccent.shade400,
-                      textColor: Colors.black,
-                      shadowColor: Colors.transparent,
-                      borderColor: Colors.transparent,
-                      icon: Iconsax.close_square,
-                    );
-                    return;
-                  }
-
-                  final compressedBytes = await _compressFileIfNeeded(file);
-                  fileData = base64Encode(compressedBytes);
-                  fileName = file.path.split('/').last;
-
-                  print('📁 File Info: ${fileSize ~/ 1000}KB -> ${compressedBytes.length ~/ 1000}KB');
-                }
-
-                final newRequest = RequestModel(
-                  id: DateTime.now().millisecondsSinceEpoch.toString(),
-                  userId: statusController.getCurrentUserId(),
-                  userName: statusController.getCurrentUserName(),
-                  userEmail: statusController.getCurrentUserEmail(),
-                  userProfileImage: '',
-                  userRole: 'employee',
-                  userFirstName: '',
-                  userLastName: '',
-                  category: widget.category,
-                  type: widget.type,
-                  reason: widget.reason,
-                  description: _descController.text.trim(),
-                  filePath: file?.path,
-                  fileName: fileName,
-                  fileData: fileData,
-                  fromDate: fromDate,
-                  toDate: toDate,
-                  status: 'pending',
-                  createdAt: Timestamp.now(),
-                );
-
-                print('🚀 === SUBMITTING TO FIREBASE ===');
-                print('🚀 User: ${newRequest.userName} (${newRequest.userId})');
-                print('🚀 Email: ${newRequest.userEmail}');
-                print('🚀 Category: ${newRequest.category}');
-                print('🚀 File Size: ${fileData?.length ?? 0} bytes');
-
-                statusController.addRequest(newRequest);
-
-                Get.offAll(() => RequestStatusScreen());
-
-                CustomSnackBar.show(
-                  title: "Success",
-                  message: "Request submitted successfully!",
-                  backgroundColor: Colors.greenAccent.shade400,
-                  textColor: Colors.black,
-                  shadowColor: Colors.transparent,
-                  borderColor: Colors.transparent,
-                  icon: Iconsax.tick_square,
-                );
-              }
+              _submitRequest(file);
             },
             child: const Text(
               "Submit Request",

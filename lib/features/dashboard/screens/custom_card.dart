@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
-class CustomCard extends StatelessWidget {
+class CustomCard extends StatefulWidget {
   final String imagePath;
   final String text;
   final VoidCallback? onTap;
@@ -13,59 +14,118 @@ class CustomCard extends StatelessWidget {
   });
 
   @override
+  State<CustomCard> createState() => _CustomCardState();
+}
+
+class _CustomCardState extends State<CustomCard>
+    with SingleTickerProviderStateMixin {
+  double _scale = 1.0;
+  AnimationController? _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+    AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 120),
+      lowerBound: 0.97,
+      upperBound: 1.0,
+    )..addListener(() {
+      setState(() {
+        _scale = _controller!.value;
+      });
+    });
+    _controller!.value = 1.0;
+  }
+
+  void _onTapDown(TapDownDetails details) {
+    _controller?.reverse(from: 1.0);
+  }
+
+  void _onTapUp(TapUpDetails details) {
+    _controller?.forward(from: 0.97);
+  }
+
+  void _onTapCancel() {
+    _controller?.forward(from: 0.97);
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTapDown: _onTapDown,
+      onTapUp: _onTapUp,
+      onTapCancel: _onTapCancel,
+      onTap: widget.onTap,
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
-        child: Container(
-          height: 100,
-          width: 100,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
-            color: Color(0xFFFFFFFF),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
-                blurRadius: 10,
-                spreadRadius: 2,
-                offset: Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  height: 38,
-                  width: 38,
-                  padding: EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Color(0xFFDEDAFC),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Container(
+        child: Transform.scale(
+          scale: _scale,
+          child: Container(
+            height: 100,
+            width: 100,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              color: Color(0xFFFFFFFF),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.15),
+                  blurRadius: 25,
+                  spreadRadius: 1,
+                  offset: Offset(0, 8),
+                ),
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 10,
+                  spreadRadius: 0,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(6),
-                      image: DecorationImage(
-                        image: AssetImage(imagePath),
-                        fit: BoxFit.cover,
-                      ),
+                      shape: BoxShape.circle,
+                      color: Color(0xFFF5F5F5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 8,
+                          spreadRadius: 1,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: SvgPicture.asset(
+                      widget.imagePath,
+                      height: 35,
+                      width: 35,
+                      fit: BoxFit.contain,
                     ),
                   ),
-                ),
-                SizedBox(height: 5),
-                Text(
-                  text,
-                  style: TextStyle(
-                    fontFamily: "bold",
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF36434A),
-                    fontSize: 12,
+                  SizedBox(height: 6),
+                  Text(
+                    widget.text,
+                    style: TextStyle(
+                      fontFamily: "poppins",
+                      fontWeight: FontWeight.w700,
+                      color: Colors.grey,
+                      fontSize: 13,
+                    ),
                   ),
-                )
-              ],
+                ],
+              ),
             ),
           ),
         ),

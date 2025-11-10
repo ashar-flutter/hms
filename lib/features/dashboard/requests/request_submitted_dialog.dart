@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-import '../../main_dashboard.dart';
-
-class ShowDataDialog extends StatelessWidget {
-  final String docName;
-  final String docType;
-  final String expiryDate;
+class RequestSubmittedDialog extends StatelessWidget {
+  final String category;
+  final String type;
+  final String reason;
+  final DateTime? fromDate;
+  final DateTime? toDate;
+  final String description;
   final String fileName;
 
-  const ShowDataDialog({
+  const RequestSubmittedDialog({
     super.key,
-    required this.docName,
-    required this.docType,
-    required this.expiryDate,
+    required this.category,
+    required this.type,
+    required this.reason,
+    required this.fromDate,
+    required this.toDate,
+    required this.description,
     required this.fileName,
   });
 
@@ -44,15 +49,12 @@ class ShowDataDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
           _buildHeader(),
           const SizedBox(height: 25),
 
-          // Data Container
           _buildDataContainer(),
           const SizedBox(height: 25),
 
-          // Done Button
           _buildDoneButton(context),
         ],
       ),
@@ -71,13 +73,13 @@ class ShowDataDialog extends StatelessWidget {
           child: const Icon(
             Icons.check_circle_rounded,
             color: Colors.green,
-            size: 28,
+            size: 25,
           ),
         ),
         const SizedBox(width: 15),
         const Expanded(
           child: Text(
-            "Document Submitted Successfully!",
+            "Request Submitted Successfully!",
             style: TextStyle(
               fontFamily: "bold",
               fontSize: 14,
@@ -95,18 +97,21 @@ class ShowDataDialog extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.grey.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(
-          color: Colors.grey.withValues(alpha: 0.2),
-          width: 1,
-        ),
+        border: Border.all(color: Colors.grey.withValues(alpha: 0.2), width: 1),
       ),
       child: Column(
         children: [
-          _buildDataRow("Document Name", docName),
+          _buildDataRow("Category", category),
           const SizedBox(height: 12),
-          _buildDataRow("Document Type", docType),
+          _buildDataRow("Type", type),
           const SizedBox(height: 12),
-          _buildDataRow("Expiry Date", expiryDate),
+          _buildDataRow("Reason", reason),
+          const SizedBox(height: 12),
+          _buildDataRow("From Date", _formatDate(fromDate)),
+          const SizedBox(height: 12),
+          _buildDataRow("To Date", _formatDate(toDate)),
+          const SizedBox(height: 12),
+          _buildDataRow("Description", description),
           const SizedBox(height: 12),
           _buildDataRow("Attached File", fileName),
         ],
@@ -125,14 +130,12 @@ class ShowDataDialog extends StatelessWidget {
             style: const TextStyle(
               fontFamily: "bold",
               color: Colors.black54,
-              fontSize: 14,
+              fontSize: 13,
               fontWeight: FontWeight.w600,
             ),
           ),
         ),
-        const Text(":", style: TextStyle(
-            fontFamily: "poppins",
-            color: Colors.black54, fontSize: 14)),
+        const Text(":", style: TextStyle(color: Colors.black54, fontSize: 14)),
         const SizedBox(width: 10),
         Expanded(
           child: Text(
@@ -148,6 +151,11 @@ class ShowDataDialog extends StatelessWidget {
     );
   }
 
+  String _formatDate(DateTime? date) {
+    if (date == null) return "Not selected";
+    return DateFormat('dd/MM/yyyy').format(date);
+  }
+
   Widget _buildDoneButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
@@ -155,15 +163,6 @@ class ShowDataDialog extends StatelessWidget {
       child: ElevatedButton(
         onPressed: () {
           Navigator.of(context).pop();
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (_) => MainDashboard(firstname: '', lastname: ''),
-              ),
-                  (route) => false,
-            );
-          });
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.transparent,
@@ -190,7 +189,6 @@ class ShowDataDialog extends StatelessWidget {
                 fontFamily: "bold",
                 color: Colors.white,
                 fontSize: 15,
-                fontWeight: FontWeight.bold,
               ),
             ),
           ),

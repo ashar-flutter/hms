@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:hr_flow/features/dashboard/attendance/attendance_screen.dart';
 import 'package:hr_flow/features/dashboard/documents/screens/main_document_page.dart';
-import 'package:hr_flow/features/dashboard/payroll/main_payroll_page.dart';
 import 'package:hr_flow/features/dashboard/reports/reports.dart';
 import 'package:hr_flow/features/dashboard/requests/main_request_screen.dart';
 import 'package:hr_flow/features/dashboard/screens/attendance_card.dart';
 import 'package:hr_flow/features/dashboard/screens/custom_card.dart';
 import 'package:get/get.dart';
+import 'package:hr_flow/features/dashboard/screens/leave_balance/pages/balance_card.dart';
 import 'package:hr_flow/features/dashboard/screens/request_notification_screen.dart';
 import '../documents/service/user_document_status_service.dart';
 import '../requests/controller/notification_controller.dart';
@@ -27,7 +27,7 @@ class HomeDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade200,
+      backgroundColor: Color(0xFFF8F9FA),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70),
         child: AppBar(
@@ -36,15 +36,20 @@ class HomeDashboard extends StatelessWidget {
           title: Center(
             child: Column(
               children: [
-                const SizedBox(height: 15),
-                Text(
-                  fName.isNotEmpty && lName.isNotEmpty
-                      ? 'Welcome $fName $lName'
-                      : 'Dashboard',
-                  style: const TextStyle(
-                    fontFamily: "bold",
-                    fontSize: 15,
-                    color: Colors.black,
+                Padding(
+                  padding: const EdgeInsets.only(left: 15),
+                  child: Align(
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      fName.isNotEmpty && lName.isNotEmpty
+                          ? 'Welcome $fName $lName'
+                          : 'Dashboard',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -62,8 +67,9 @@ class HomeDashboard extends StatelessWidget {
               boxShadow: [
                 BoxShadow(
                   color: Colors.black26,
-                  blurRadius: 20,
-                  offset: Offset(0, 10),
+                  blurRadius: 25,
+                  spreadRadius: 2,
+                  offset: Offset(0, 12),
                 ),
               ],
             ),
@@ -72,30 +78,21 @@ class HomeDashboard extends StatelessWidget {
             Obx(
               () => Stack(
                 children: [
-                  Container(
-                    height: 40,
-                    width: 40,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15),
-                      color: const Color(0xFFE9E9E9),
-                      border: Border.all(color: Colors.amber, width: 1),
-                    ),
-                    child: Center(
-                      child: IconButton(
-                        icon: const Icon(
-                          size: 26,
-                          Icons.notifications,
-                          color: Colors.black,
-                        ),
-                        onPressed: () {
-                          Get.to(() => NotificationsScreen());
-                        },
+                  Center(
+                    child: IconButton(
+                      icon: const Icon(
+                        size: 22,
+                        Icons.notifications,
+                        color: Colors.black,
                       ),
+                      onPressed: () {
+                        Get.to(() => NotificationsScreen());
+                      },
                     ),
                   ),
                   if (notificationController.unreadCount.value > 0)
                     Positioned(
-                      right: -2,
+                      right: 8,
                       top: 8,
                       child: Container(
                         padding: const EdgeInsets.all(2),
@@ -121,7 +118,6 @@ class HomeDashboard extends StatelessWidget {
                 ],
               ),
             ),
-            const SizedBox(width: 10),
           ],
         ),
       ),
@@ -131,14 +127,20 @@ class HomeDashboard extends StatelessWidget {
             children: [
               SizedBox(height: AppBar().preferredSize.height / 2),
               const AttendanceCard(),
+              SizedBox(height: AppBar().preferredSize.height / 3),
+              BalanceCard(),
               SizedBox(height: AppBar().preferredSize.height / 2),
               const Padding(
-                padding: EdgeInsets.only(left: 15),
+                padding: EdgeInsets.only(left: 20),
                 child: Align(
                   alignment: Alignment.topLeft,
                   child: Text(
                     "What would you like to do?",
-                    style: TextStyle(fontFamily: "bold", color: Colors.black),
+                    style: TextStyle(
+                      fontFamily: "bold",
+                      color: Colors.black,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ),
@@ -151,17 +153,18 @@ class HomeDashboard extends StatelessWidget {
                       Get.to(() => AttendanceScreen());
                     },
                     text: "Attendance",
-                    imagePath: "assets/dashboard/attendance.png",
+                    imagePath: "assets/dashboard/futuristic_attendance_icon.svg",
                   ),
                   CustomCard(
                     onTap: () {
                       Get.to(() => MainRequestScreen());
                     },
                     text: "Requests",
-                    imagePath: "assets/dashboard/requests.png",
+                    imagePath: "assets/dashboard/futuristic_leave_icon.svg",
                   ),
                   Obx(() {
-                    final responseCount = documentStatusService.responseCount.value;
+                    final responseCount =
+                        documentStatusService.responseCount.value;
                     return Stack(
                       clipBehavior: Clip.none,
                       children: [
@@ -170,7 +173,7 @@ class HomeDashboard extends StatelessWidget {
                             Get.to(() => MainDocumentPage());
                           },
                           text: "Documents",
-                          imagePath: "assets/dashboard/documents.png",
+                          imagePath: "assets/dashboard/heavy_document_icon.svg",
                         ),
                         if (responseCount > 0)
                           Positioned(
@@ -181,14 +184,19 @@ class HomeDashboard extends StatelessWidget {
                               decoration: BoxDecoration(
                                 color: Colors.red,
                                 shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 2),
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 2,
+                                ),
                               ),
                               constraints: const BoxConstraints(
                                 minWidth: 18,
                                 minHeight: 18,
                               ),
                               child: Text(
-                                responseCount > 9 ? '9+' : responseCount.toString(),
+                                responseCount > 9
+                                    ? '9+'
+                                    : responseCount.toString(),
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 8,
@@ -205,25 +213,29 @@ class HomeDashboard extends StatelessWidget {
               ),
               const SizedBox(height: 15),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  CustomCard(
-                    onTap: () {
-                      Get.to(() => Reports());
-                    },
-                    text: "Reports",
-                    imagePath: "assets/dashboard/reports.png",
+                  Padding(
+                    padding: const EdgeInsets.only(left: 15),
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: CustomCard(
+                        onTap: () {
+                          Get.to(() => Reports());
+                        },
+                        text: "Reports",
+                        imagePath: "assets/dashboard/futuristic_reports_icon.svg",
+                      ),
+                    ),
                   ),
-                  CustomCard(
-                    onTap: () {
-                      Get.to(() => MainPayrollPage());
-                    },
-                    text: "Payroll",
-                    imagePath: "assets/dashboard/payroll.png",
-                  ),
-                  CustomCard(
-                    text: "Calendar",
-                    imagePath: "assets/dashboard/calendar.png",
+                  Padding(
+                    padding: const EdgeInsets.only(left: 15),
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: CustomCard(
+                        text: "Calendar",
+                        imagePath: "assets/dashboard/futuristic_calendar_icon.svg",
+                      ),
+                    ),
                   ),
                 ],
               ),

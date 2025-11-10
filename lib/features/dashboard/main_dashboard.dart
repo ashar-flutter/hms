@@ -3,6 +3,7 @@ import 'package:hr_flow/features/chats/screens/main_chat_screen.dart';
 import 'package:hr_flow/features/dashboard/screens/home_dashboard.dart';
 import 'package:hr_flow/core/services/credential_store_service.dart';
 import 'package:hr_flow/features/user/user_information/user_information.dart';
+import 'package:iconsax/iconsax.dart';
 
 import '../profile/service/profile_update_service.dart';
 
@@ -31,7 +32,7 @@ class _MainDashboardState extends State<MainDashboard> {
       HomeDashboard(fName: '', lName: ''),
       const Center(child: Text("History Screen")),
       MainChatScreen(),
-      UserInformation(),
+     UserInformation()
     ];
     _loadUserData();
     _updateExistingProfiles();
@@ -54,7 +55,7 @@ class _MainDashboardState extends State<MainDashboard> {
           ),
           const Center(child: Text("History Screen")),
           MainChatScreen(),
-          UserInformation(),
+          UserInformation()
         ];
       });
     }
@@ -63,10 +64,14 @@ class _MainDashboardState extends State<MainDashboard> {
   @override
   Widget build(BuildContext context) {
     final List<Map<String, dynamic>> navItems = [
-      {'icon': Icons.home, 'label': "Home", 'index': 0},
-      {'icon': Icons.history, 'label': "History", 'index': 1},
-      {'icon': Icons.message_rounded, 'label': "Message", 'index': 2},
-      {'icon': Icons.account_circle_rounded, 'label': "Profile", 'index': 3},
+      {'icon': Iconsax.home_1, 'label': "Home", 'index': 0},
+      {
+        'icon': Icons.history_toggle_off_outlined,
+        'label': "History",
+        'index': 1,
+      },
+      {'icon': Iconsax.message, 'label': "Message", 'index': 2},
+      {'icon': Iconsax.profile_circle, 'label': "Profile", 'index': 3},
     ];
 
     return Scaffold(
@@ -87,47 +92,27 @@ class _MainDashboardState extends State<MainDashboard> {
                 ),
                 boxShadow: [
                   BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.2),
+                    blurRadius: 25,
+                    spreadRadius: 2,
+                    offset: const Offset(0, -5),
+                  ),
+                  BoxShadow(
                     color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 10,
+                    spreadRadius: 1,
                     offset: const Offset(0, -2),
                   ),
                 ],
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _buildNavItem(navItems[0], 0),
                   _buildNavItem(navItems[1], 1),
-                  const SizedBox(width: 60),
                   _buildNavItem(navItems[2], 2),
                   _buildNavItem(navItems[3], 3),
                 ],
-              ),
-            ),
-            Positioned(
-              top: 0,
-              child: GestureDetector(
-                onTap: () {},
-                child: Container(
-                  width: 65,
-                  height: 65,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF6366F1).withValues(alpha: 0.4),
-                        blurRadius: 10,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(Icons.add, color: Colors.white, size: 24),
-                ),
               ),
             ),
           ],

@@ -5,10 +5,13 @@ import 'package:hr_flow/features/splash/splash_screen.dart';
 
 import 'features/dashboard/documents/service/document_count_service.dart';
 import 'features/dashboard/documents/service/user_document_status_service.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   Get.put(DocumentCountService(), permanent: true);
   Get.put(UserDocumentStatusService(), permanent: true);

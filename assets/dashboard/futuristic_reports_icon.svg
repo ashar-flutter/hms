@@ -1,0 +1,141 @@
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradient for folder -->
+    <linearGradient id="folderGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F6AD55;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#ED8936;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#DD6B20;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Gradient for documents -->
+    <linearGradient id="docGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#F7FAFC;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#EDF2F7;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Gradient for chart lines -->
+    <linearGradient id="chartLineGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" style="stop-color:#4299E1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#63B3ED;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Glow effect -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Strong glow -->
+    <filter id="strongGlow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Shadow -->
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+  
+  <!-- Main shadow -->
+  <ellipse cx="60" cy="108" rx="45" ry="8" fill="#000000" opacity="0.25"/>
+  
+  <!-- Folder back part with 3D depth -->
+  <path d="M 15 40 L 15 95 Q 15 100 20 100 L 100 100 Q 105 100 105 95 L 105 40 Z" 
+        fill="url(#folderGradient)" filter="url(#shadow)" stroke="#C05621" stroke-width="2.5"/>
+  
+  <!-- 3D depth edge on folder -->
+  <path d="M 17 45 L 17 95 Q 17 98 19 98" fill="none" stroke="#FBD38D" stroke-width="2.5" opacity="0.6"/>
+  
+  <!-- Folder tab -->
+  <path d="M 15 40 L 15 30 Q 15 25 20 25 L 45 25 L 52 32 L 105 32 L 105 40 Z" 
+        fill="url(#folderGradient)" stroke="#C05621" stroke-width="2.5"/>
+  
+  <!-- Tab 3D highlight -->
+  <path d="M 17 30 Q 17 27 19 27 L 44 27" fill="none" stroke="#FBD38D" stroke-width="2" opacity="0.6"/>
+  
+  <!-- Document stack - back document -->
+  <rect x="32" y="45" width="50" height="50" rx="3" 
+        fill="url(#docGradient)" stroke="#CBD5E0" stroke-width="2" opacity="0.7" 
+        transform="rotate(-3 57 70)"/>
+  
+  <!-- Document stack - middle document -->
+  <rect x="35" y="47" width="50" height="50" rx="3" 
+        fill="url(#docGradient)" stroke="#CBD5E0" stroke-width="2" opacity="0.85" 
+        transform="rotate(2 60 72)"/>
+  
+  <!-- Main front document with chart -->
+  <rect x="38" y="50" width="50" height="50" rx="3" 
+        fill="url(#docGradient)" filter="url(#shadow)" stroke="#A0AEC0" stroke-width="2.5"/>
+  
+  <!-- Document highlight -->
+  <line x1="39" y1="53" x2="39" y2="97" stroke="#FFFFFF" stroke-width="2" opacity="0.6"/>
+  
+  <!-- Document header lines -->
+  <line x1="43" y1="56" x2="60" y2="56" stroke="#4A5568" stroke-width="2" stroke-linecap="round"/>
+  <line x1="43" y1="61" x2="83" y2="61" stroke="#718096" stroke-width="1.5" stroke-linecap="round"/>
+  
+  <!-- Futuristic chart on document -->
+  <g filter="url(#glow)">
+    <!-- Chart area background -->
+    <rect x="43" y="68" width="40" height="26" rx="2" fill="#EDF2F7" opacity="0.5"/>
+    
+    <!-- Rising chart line with gradient -->
+    <path d="M 45 90 L 50 85 L 56 87 L 62 80 L 68 82 L 74 75 L 80 78" 
+          fill="none" stroke="url(#chartLineGradient)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- Area under chart -->
+    <path d="M 45 90 L 50 85 L 56 87 L 62 80 L 68 82 L 74 75 L 80 78 L 80 90 Z" 
+          fill="url(#chartLineGradient)" opacity="0.2"/>
+    
+    <!-- Data points on chart -->
+    <circle cx="45" cy="90" r="2" fill="#4299E1"/>
+    <circle cx="50" cy="85" r="2" fill="#4299E1"/>
+    <circle cx="56" cy="87" r="2" fill="#4299E1"/>
+    <circle cx="62" cy="80" r="2" fill="#4299E1"/>
+    <circle cx="68" cy="82" r="2" fill="#4299E1"/>
+    <circle cx="74" cy="75" r="2" fill="#4299E1"/>
+    <circle cx="80" cy="78" r="2" fill="#4299E1"/>
+  </g>
+  
+  <!-- Glowing data point highlights -->
+  <g filter="url(#strongGlow)">
+    <circle cx="62" cy="80" r="1.5" fill="#FFFFFF"/>
+    <circle cx="74" cy="75" r="1.5" fill="#FFFFFF"/>
+  </g>
+  
+  <!-- Chart grid lines (subtle) -->
+  <line x1="43" y1="75" x2="83" y2="75" stroke="#CBD5E0" stroke-width="0.5" opacity="0.5"/>
+  <line x1="43" y1="82" x2="83" y2="82" stroke="#CBD5E0" stroke-width="0.5" opacity="0.5"/>
+  <line x1="43" y1="90" x2="83" y2="90" stroke="#CBD5E0" stroke-width="0.5" opacity="0.5"/>
+  
+  <!-- Analytics icon indicators -->
+  <g filter="url(#glow)">
+    <!-- Small bar chart indicator -->
+    <rect x="69" y="57" width="2" height="4" rx="0.5" fill="#48BB78"/>
+    <rect x="72" y="55" width="2" height="6" rx="0.5" fill="#4299E1"/>
+    <rect x="75" y="53" width="2" height="8" rx="0.5" fill="#ED8936"/>
+  </g>
+  
+  <!-- Digital corner indicator -->
+  <g filter="url(#strongGlow)">
+    <circle cx="82" cy="54" r="3" fill="#48BB78" opacity="0.3"/>
+    <circle cx="82" cy="54" r="1.5" fill="#48BB78"/>
+  </g>
+  
+  <!-- Futuristic scan lines (subtle) -->
+  <line x1="38" y1="65" x2="88" y2="65" stroke="#4299E1" stroke-width="0.5" opacity="0.15"/>
+  <line x1="38" y1="72" x2="88" y2="72" stroke="#4299E1" stroke-width="0.5" opacity="0.15"/>
+  <line x1="38" y1="79" x2="88" y2="79" stroke="#4299E1" stroke-width="0.5" opacity="0.15"/>
+  <line x1="38" y1="86" x2="88" y2="86" stroke="#4299E1" stroke-width="0.5" opacity="0.15"/>
+  
+  <!-- Holographic corner accent -->
+  <path d="M 85 52 L 87 52 L 87 54" fill="none" stroke="#63B3ED" stroke-width="1.5" opacity="0.6" stroke-linecap="round"/>
+</svg>

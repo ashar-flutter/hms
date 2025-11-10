@@ -87,7 +87,6 @@ class _AttendanceScreenState extends State<AttendanceScreen>
       });
     }
   }
-
   Future<void> _restoreBreakState() async {
     final breakStatus = await _controller.getBreakStatus();
     final breakDuration = await _controller.getBreakDuration();
@@ -108,7 +107,6 @@ class _AttendanceScreenState extends State<AttendanceScreen>
       });
     }
   }
-
   @override
   void dispose() {
     controller.dispose();
@@ -179,7 +177,6 @@ class _AttendanceScreenState extends State<AttendanceScreen>
       }
     });
   }
-
   Future<void> _toggleBreak() async {
     if (!_canCheckIn) {
       CustomSnackBar.show(
@@ -196,13 +193,11 @@ class _AttendanceScreenState extends State<AttendanceScreen>
     if (!mounted) return;
 
     final wasOnBreak = isOnBreak;
-    final currentStored = await _controller.getBreakDuration();
 
     setState(() => isOnBreak = !isOnBreak);
 
     if (!wasOnBreak && isOnBreak) {
-      _breakDuration = currentStored;
-      _breakStartTime = DateTime.now().subtract(_breakDuration);
+      _breakStartTime = DateTime.now();
       _breakTimer?.cancel();
       _breakTimer = Timer.periodic(const Duration(seconds: 1), (_) {
         if (mounted) {
@@ -213,8 +208,8 @@ class _AttendanceScreenState extends State<AttendanceScreen>
       });
     } else if (wasOnBreak && !isOnBreak) {
       _breakTimer?.cancel();
-      final totalBreak = DateTime.now().difference(_breakStartTime!);
-      _breakDuration = totalBreak;
+      final currentBreakDuration = DateTime.now().difference(_breakStartTime!);
+      _breakDuration = currentBreakDuration;
     }
 
     await _controller.saveBreakState(isOnBreak, _breakDuration);
@@ -231,7 +226,6 @@ class _AttendanceScreenState extends State<AttendanceScreen>
       );
     }
   }
-
   String _formatDuration(Duration d) {
     final h = d.inHours.toString().padLeft(2, '0');
     final m = (d.inMinutes % 60).toString().padLeft(2, '0');

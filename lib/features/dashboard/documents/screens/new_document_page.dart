@@ -50,10 +50,10 @@ class _NewDocumentPageState extends State<NewDocumentPage> {
         fileName: attachedFile!.name,
         filePath: attachedFile!.path,
       );
-
+      if (!mounted) return;
       showDialog(
         context: context,
-        barrierColor: Colors.black.withOpacity(0.5),
+        barrierColor: Colors.black.withValues(alpha: 0.5),
         barrierDismissible: false,
         builder: (context) => ShowDataDialog(
           docName: docNameController.text.trim(),
@@ -65,8 +65,6 @@ class _NewDocumentPageState extends State<NewDocumentPage> {
         _clearForm();
         Get.back();
       });
-
-    } catch (e) {
     } finally {
       setState(() {
         _isSubmitting = false;
@@ -163,7 +161,7 @@ class _NewDocumentPageState extends State<NewDocumentPage> {
               child: Align(
                 alignment: Alignment.topLeft,
                 child: Text(
-                  "Expire",
+                  "Submission Date",
                   style: TextStyle(fontFamily: "bold", color: Colors.black),
                 ),
               ),
@@ -198,7 +196,7 @@ class _NewDocumentPageState extends State<NewDocumentPage> {
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.5),
+              color: Colors.black.withValues(alpha: 0.5),
               blurRadius: 40,
               spreadRadius: 6,
               offset: const Offset(0, 12),
@@ -212,7 +210,9 @@ class _NewDocumentPageState extends State<NewDocumentPage> {
           height: 55,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: _isSubmitting ? Colors.grey : const Color(0xFF6A11CB),
+              backgroundColor: _isSubmitting
+                  ? Colors.grey
+                  : const Color(0xFF6A11CB),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(28),
               ),
@@ -220,21 +220,21 @@ class _NewDocumentPageState extends State<NewDocumentPage> {
             onPressed: _isSubmitting ? null : _onSave,
             child: _isSubmitting
                 ? SizedBox(
-              height: 20,
-              width: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
-            )
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
                 : const Text(
-              "Save",
-              style: TextStyle(
-                fontFamily: "bold",
-                color: Colors.white,
-                fontSize: 15,
-              ),
-            ),
+                    "Save",
+                    style: TextStyle(
+                      fontFamily: "bold",
+                      color: Colors.white,
+                      fontSize: 15,
+                    ),
+                  ),
           ),
         ),
       ),

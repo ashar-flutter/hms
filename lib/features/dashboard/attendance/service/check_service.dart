@@ -17,10 +17,10 @@ class CheckService {
     required double lng,
   }) async {
     final currentUid = uid;
-    if (currentUid == null) {
-      print('User not logged in');
-      return;
-    }
+    if (currentUid == null) return;
+
+    final userDoc = await _firestore.collection('users').doc(currentUid).get();
+    final userData = userDoc.data() ?? {};
 
     await _firestore
         .collection('attendance')
@@ -28,6 +28,10 @@ class CheckService {
         .collection('records')
         .doc(date)
         .set({
+      'userId': currentUid,
+      'firstName': userData['firstName'] ?? '',
+      'lastName': userData['lastName'] ?? '',
+      'role': userData['role'] ?? 'employee',
       'date': date,
       'checkInTime': checkInTime,
       'checkOutTime': checkOutTime,

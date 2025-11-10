@@ -1,0 +1,45 @@
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradient for 3D blue document -->
+    <linearGradient id="docGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#5B9FFF;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#4A8AE8;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3B75D1;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Shadow gradient -->
+    <linearGradient id="shadowGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#000000;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#000000;stop-opacity:0" />
+    </linearGradient>
+    
+    <!-- Corner gradient - darker blue -->
+    <linearGradient id="cornerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B75D1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2A5AA8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Shadow for depth -->
+  <path d="M 28 20 L 73 20 L 92 39 L 92 102 L 28 102 Z" fill="url(#shadowGradient)" opacity="0.3" transform="translate(3, 3)"/>
+  
+  <!-- Main document body with 3D blue gradient -->
+  <path d="M 25 15 L 70 15 L 89 34 L 89 100 L 25 100 Z" fill="url(#docGradient)" stroke="#2A5AA8" stroke-width="2"/>
+  
+  <!-- Folded corner - darker blue shade -->
+  <path d="M 70 15 L 70 34 L 89 34 Z" fill="url(#cornerGradient)" stroke="#2A5AA8" stroke-width="2"/>
+  
+  <!-- Fold line for 3D effect -->
+  <line x1="70" y1="34" x2="89" y2="34" stroke="#1E4A8F" stroke-width="1.5"/>
+  <line x1="70" y1="15" x2="70" y2="34" stroke="#1E4A8F" stroke-width="1.5"/>
+  
+  <!-- Document text lines in white -->
+  <line x1="35" y1="45" x2="79" y2="45" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+  <line x1="35" y1="55" x2="79" y2="55" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+  <line x1="35" y1="65" x2="79" y2="65" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+  <line x1="35" y1="75" x2="69" y2="75" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+  <line x1="35" y1="85" x2="74" y2="85" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+  
+  <!-- Highlight for 3D depth on left edge -->
+  <line x1="26" y1="20" x2="26" y2="98" stroke="#7AB5FF" stroke-width="2" opacity="0.7"/>
+</svg>
