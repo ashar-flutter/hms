@@ -1,0 +1,126 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4f46e5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2563eb;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="skinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="shirtGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0891b2;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow3d">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8"/>
+      <feOffset dx="0" dy="15" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.4"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <radialGradient id="faceGlow">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Main Employee Figure with 3D depth -->
+  <g transform="translate(200, 120)" filter="url(#shadow3d)">
+    
+    <!-- Body/Torso - Layer 3 (back) -->
+    <ellipse cx="5" cy="195" rx="85" ry="95" fill="#1e40af" opacity="0.3"/>
+    
+    <!-- Body/Torso - Layer 2 -->
+    <ellipse cx="0" cy="190" rx="85" ry="95" fill="#2563eb" opacity="0.6"/>
+    
+    <!-- Body/Torso - Layer 1 (front) -->
+    <ellipse cx="-5" cy="185" rx="85" ry="95" fill="url(#bodyGrad)"/>
+    
+    <!-- Shirt/Collar details -->
+    <path d="M -40 160 Q -45 165 -50 175 L -50 200 Q -50 210 -40 215 L -40 160 Z" fill="url(#shirtGrad)"/>
+    <path d="M 40 160 Q 45 165 50 175 L 50 200 Q 50 210 40 215 L 40 160 Z" fill="url(#shirtGrad)"/>
+    <path d="M -30 155 L 30 155 L 30 175 Q 0 185 -30 175 Z" fill="#0891b2"/>
+    
+    <!-- Neck - 3D layers -->
+    <rect x="-18" y="85" width="36" height="75" rx="18" fill="#d97706" opacity="0.4"/>
+    <rect x="-15" y="82" width="30" height="75" rx="15" fill="url(#skinGrad)"/>
+    
+    <!-- Head - Layer 3 (back) -->
+    <ellipse cx="5" cy="5" rx="68" ry="75" fill="#d97706" opacity="0.3"/>
+    
+    <!-- Head - Layer 2 -->
+    <ellipse cx="0" cy="0" rx="68" ry="75" fill="#f59e0b" opacity="0.6"/>
+    
+    <!-- Head - Layer 1 (front) -->
+    <ellipse cx="-5" cy="-5" rx="68" ry="75" fill="url(#skinGrad)"/>
+    <ellipse cx="-5" cy="-5" rx="68" ry="75" fill="url(#faceGlow)"/>
+    
+    <!-- Hair - 3D styled -->
+    <path d="M -70 -20 Q -75 -50 -60 -70 Q -40 -85 -10 -80 Q 20 -85 40 -75 Q 65 -60 65 -30 Q 68 0 60 10 L 55 -5 Q 50 -40 40 -55 Q 20 -70 0 -68 Q -25 -70 -45 -50 Q -60 -30 -65 0 Z" fill="#1f2937" opacity="0.9"/>
+    <path d="M -68 -22 Q -73 -48 -58 -68 Q -38 -83 -8 -78 Q 22 -83 42 -73 Q 67 -58 67 -28" fill="none" stroke="#374151" stroke-width="2"/>
+    
+    <!-- Facial Features -->
+    <!-- Eyes -->
+    <ellipse cx="-25" cy="-15" rx="8" ry="10" fill="#ffffff"/>
+    <ellipse cx="20" cy="-15" rx="8" ry="10" fill="#ffffff"/>
+    <circle cx="-25" cy="-13" r="5" fill="#1f2937"/>
+    <circle cx="20" cy="-13" r="5" fill="#1f2937"/>
+    <circle cx="-23" cy="-15" r="2" fill="#ffffff"/>
+    <circle cx="22" cy="-15" r="2" fill="#ffffff"/>
+    
+    <!-- Eyebrows -->
+    <path d="M -35 -28 Q -25 -32 -15 -28" fill="none" stroke="#1f2937" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 10 -28 Q 20 -32 30 -28" fill="none" stroke="#1f2937" stroke-width="3" stroke-linecap="round"/>
+    
+    <!-- Nose -->
+    <path d="M -3 -5 L -5 15 Q -5 20 0 20 Q 5 20 5 15 L 3 -5" fill="#d97706" opacity="0.4"/>
+    <ellipse cx="-6" cy="18" rx="3" ry="4" fill="#d97706" opacity="0.3"/>
+    <ellipse cx="6" cy="18" rx="3" ry="4" fill="#d97706" opacity="0.3"/>
+    
+    <!-- Smile -->
+    <path d="M -20 30 Q 0 42 20 30" fill="none" stroke="#b45309" stroke-width="3" stroke-linecap="round"/>
+    <path d="M -18 31 Q 0 40 18 31" fill="#ffffff" opacity="0.3"/>
+    
+    <!-- Ears -->
+    <ellipse cx="-65" cy="5" rx="12" ry="20" fill="#f59e0b"/>
+    <ellipse cx="-63" cy="5" rx="6" ry="12" fill="#d97706" opacity="0.5"/>
+    <ellipse cx="60" cy="5" rx="12" ry="20" fill="#f59e0b"/>
+    <ellipse cx="58" cy="5" rx="6" ry="12" fill="#d97706" opacity="0.5"/>
+    
+    <!-- Arms -->
+    <ellipse cx="-75" cy="200" rx="25" ry="70" fill="#2563eb" opacity="0.8" transform="rotate(-20 -75 200)"/>
+    <ellipse cx="70" cy="200" rx="25" ry="70" fill="#2563eb" opacity="0.8" transform="rotate(20 70 200)"/>
+    
+    <!-- Hands -->
+    <circle cx="-85" cy="255" r="18" fill="#f59e0b"/>
+    <circle cx="80" cy="255" r="18" fill="#f59e0b"/>
+    
+    <!-- Tie -->
+    <path d="M -8 165 L -12 175 L 0 245 L 12 175 L 8 165 Z" fill="#dc2626"/>
+    <path d="M -8 165 L 0 155 L 8 165 Z" fill="#ef4444"/>
+    <rect x="-3" y="155" width="6" height="8" fill="#dc2626"/>
+    
+    <!-- Buttons -->
+    <circle cx="0" cy="190" r="4" fill="#1e293b"/>
+    <circle cx="0" cy="210" r="4" fill="#1e293b"/>
+    <circle cx="0" cy="230" r="4" fill="#1e293b"/>
+    
+    <!-- ID Badge -->
+    <rect x="45" y="195" width="25" height="35" rx="3" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+    <rect x="48" y="198" width="19" height="10" rx="1" fill="#3b82f6"/>
+    <line x1="50" y1="213" x2="65" y2="213" stroke="#cbd5e1" stroke-width="2"/>
+    <line x1="50" y1="218" x2="65" y2="218" stroke="#cbd5e1" stroke-width="2"/>
+    <line x1="50" y1="223" x2="62" y2="223" stroke="#cbd5e1" stroke-width="2"/>
+    
+  </g>
+  
+  <!-- 3D Platform/Base -->
+  <ellipse cx="200" cy="360" rx="120" ry="20" fill="#1e293b" opacity="0.2"/>
+  <ellipse cx="200" cy="358" rx="110" ry="18" fill="#334155" opacity="0.3"/>
+  
+</svg>

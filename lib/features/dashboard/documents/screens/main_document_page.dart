@@ -23,14 +23,14 @@ class MainDocumentPage extends StatelessWidget {
         child: AppBar(
           leading: IconButton(
             onPressed: () => Get.back(),
-            icon: const Icon(size: 20, Icons.arrow_back),
+            icon: const Icon(size: 18, Icons.arrow_back),
           ),
           centerTitle: true,
           title: const Text(
             "Documents",
             style: TextStyle(
               fontFamily: "bold",
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),
@@ -149,11 +149,26 @@ class MainDocumentPage extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 8),
-                      Text('Type: ${data['docType'] ?? ''}'),
-                      Text('Expiry: ${data['expiryDate'] ?? ''}'),
+                      Text('Type: ${data['docType'] ?? ''}',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontFamily: "poppins"
+                      ),
+                      ),
+                      Text('Expiry: ${data['expiryDate'] ?? ''}',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontFamily: "bold"
+                      ),
+                      ),
                       if (data['adminResponse'] != null) ...[
                         const SizedBox(height: 8),
-                        Text('Admin: ${data['adminResponse']}'),
+                        Text('Admin: ${data['adminResponse']}',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontFamily: "poppins"
+                        ),
+                        ),
                       ],
                     ],
                   ),
@@ -210,7 +225,7 @@ class MainDocumentPage extends StatelessWidget {
                 style: TextStyle(
                   fontFamily: "bold",
                   color: Colors.white,
-                  fontSize: 15,
+                  fontSize: 13,
                 ),
               ),
             ),

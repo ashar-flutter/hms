@@ -39,13 +39,13 @@ class _AddRequestScreenState extends State<AddRequestScreen> {
             onPressed: () {
               Get.back();
             },
-            icon: const Icon(size: 20, Icons.arrow_back),
+            icon: const Icon(size: 18, Icons.arrow_back),
           ),
           centerTitle: true,
           title: const Text(
-            "Add New Request",
+            "Add Leave Request",
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               fontFamily: "bold",
               fontWeight: FontWeight.bold,
               color: Colors.black,
@@ -109,8 +109,9 @@ class _AddRequestScreenState extends State<AddRequestScreen> {
                   hint: Text(
                     "Select Category",
                     style: TextStyle(
-                      color: Colors.grey.shade600,
                       fontFamily: "poppins",
+                      color: Colors.grey.shade600,
+                      fontSize: 13
                     ),
                   ),
                   icon: const Icon(
@@ -124,7 +125,9 @@ class _AddRequestScreenState extends State<AddRequestScreen> {
                       value: category,
                       child: Text(
                         category,
-                        style: const TextStyle(fontFamily: "poppins"),
+                        style: const TextStyle(fontSize: 12,
+                        fontFamily: "poppins"
+                        ),
                       ),
                     );
                   }).toList(),
@@ -170,7 +173,8 @@ class _AddRequestScreenState extends State<AddRequestScreen> {
                     "Select Type",
                     style: TextStyle(
                       color: Colors.grey.shade600,
-                      fontFamily: "poppins",
+                    fontSize: 13,
+                      fontFamily: "poppins"
                     ),
                   ),
                   icon: const Icon(
@@ -184,7 +188,9 @@ class _AddRequestScreenState extends State<AddRequestScreen> {
                       value: type,
                       child: Text(
                         type,
-                        style: const TextStyle(fontFamily: "poppins"),
+                        style: const TextStyle(fontSize: 12,
+                        fontFamily: "poppins"
+                        ),
                       ),
                     );
                   }).toList(),
@@ -230,7 +236,8 @@ class _AddRequestScreenState extends State<AddRequestScreen> {
                     "Select Reason",
                     style: TextStyle(
                       color: Colors.grey.shade600,
-                      fontFamily: "poppins",
+                     fontSize: 13,
+                      fontFamily: "poppins"
                     ),
                   ),
                   icon: const Icon(
@@ -244,7 +251,9 @@ class _AddRequestScreenState extends State<AddRequestScreen> {
                       value: reason,
                       child: Text(
                         reason,
-                        style: const TextStyle(fontFamily: "poppins"),
+                        style: const TextStyle(fontSize: 12,
+                        fontFamily: "poppins"
+                        ),
                       ),
                     );
                   }).toList(),

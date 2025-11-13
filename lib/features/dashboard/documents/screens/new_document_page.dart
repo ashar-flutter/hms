@@ -87,14 +87,14 @@ class _NewDocumentPageState extends State<NewDocumentPage> {
         child: AppBar(
           leading: IconButton(
             onPressed: () => Get.back(),
-            icon: const Icon(size: 20, Icons.arrow_back),
+            icon: const Icon(size: 18, Icons.arrow_back),
           ),
           centerTitle: true,
           title: const Text(
             "Add New Document",
             style: TextStyle(
               fontFamily: "bold",
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),

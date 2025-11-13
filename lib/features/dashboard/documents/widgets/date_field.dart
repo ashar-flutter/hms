@@ -35,7 +35,7 @@ class DateField extends StatelessWidget {
         readOnly: true,
         style: const TextStyle(
           fontFamily: "poppins",
-          fontSize: 16,
+          fontSize: 13,
           color: Colors.black,
           fontWeight: FontWeight.w500,
           letterSpacing: 0.3,
@@ -45,7 +45,7 @@ class DateField extends StatelessWidget {
           hintText: "DD/MM/YYYY",
           filled: true,
           fillColor: Colors.white,
-          hintStyle: TextStyle(color: Colors.grey.shade900, fontSize: 15),
+          hintStyle: TextStyle(color: Colors.grey.shade900, fontSize: 14),
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 20,
             vertical: 16,

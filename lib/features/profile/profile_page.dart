@@ -181,9 +181,6 @@ class _ProfilePageState extends State<ProfilePage> {
     final last = lastCtr.text.trim();
     final role = roleCtr.text.trim();
 
-    // Debug print
-    print("Role selected: $role");
-
     final valid = await profileService.validation(
       context: context,
       name: name,
@@ -206,6 +203,15 @@ class _ProfilePageState extends State<ProfilePage> {
       return;
     }
 
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Center(child: CircularProgressIndicator());
+      },
+    );
+
     final success = await ProfileController().saveProfile(
       firstName: name,
       lastName: last,
@@ -213,12 +219,15 @@ class _ProfilePageState extends State<ProfilePage> {
       imagePath: _profileImage!.path,
     );
 
+    if (!mounted) return;
+    Navigator.of(context).pop();
+
     if (!success) return;
 
     CustomSnackBar.show(
       title: "Success",
       message: "Profile setup completed successfully",
-      backgroundColor: const Color.fromARGB(255, 0, 122, 255),
+      backgroundColor: Color.fromARGB(255, 0, 122, 255),
       textColor: Colors.black,
       shadowColor: Colors.lightBlueAccent,
       borderColor: Colors.transparent,
@@ -229,17 +238,16 @@ class _ProfilePageState extends State<ProfilePage> {
     await SecureStorageService.saveUserRole(role);
 
     if (!mounted) return;
-    await Future.delayed(const Duration(milliseconds: 600));
+    await Future.delayed(Duration(milliseconds: 600));
 
     if (!mounted) return;
     if (role.toLowerCase() == 'admin') {
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (_) => AdminDashboard(
-          naame: name,
-          lNaame: last,
-        )),
-            (route) => false,
+        MaterialPageRoute(
+          builder: (_) => AdminDashboard(naame: name, lNaame: last),
+        ),
+        (route) => false,
       );
     } else {
       Navigator.pushAndRemoveUntil(
@@ -247,7 +255,7 @@ class _ProfilePageState extends State<ProfilePage> {
         MaterialPageRoute(
           builder: (_) => MainDashboard(firstname: name, lastname: last),
         ),
-            (route) => false,
+        (route) => false,
       );
     }
   }
@@ -363,17 +371,17 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           items: <String>['admin', 'employee']
                               .map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(
-                                value,
-                                style: TextStyle(
-                                  fontFamily: "poppins",
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            );
-                          })
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(
+                                    value,
+                                    style: TextStyle(
+                                      fontFamily: "poppins",
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                );
+                              })
                               .toList(),
                           onChanged: (String? newValue) {
                             setState(() {

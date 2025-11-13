@@ -55,6 +55,9 @@ dependencies:
   flutter_local_notifications:
   audioplayers: ^6.5.1
   flutter_svg:
+  fl_chart: ^0.68.0
+  http:
+  url_launcher: ^6.1.11
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -95,6 +98,9 @@ flutter:
      - assets/dashboard/futuristic_calendar_icon.svg
      - assets/dashboard/futuristic_leave_icon.svg
      - assets/dashboard/futuristic_reports_icon.svg
+     - assets/dashboard/employee_card_3d.svg
+     - assets/dashboard/active_employee_3d.svg
+     - assets/dashboard/announcements_icon_3d.svg
 #     - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

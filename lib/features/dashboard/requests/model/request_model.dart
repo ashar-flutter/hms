@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RequestModel {
+  final String? fileUrl;
   final String id;
   final String userId;
   final String userName;
@@ -21,9 +22,11 @@ class RequestModel {
   final String status;
   final Timestamp? createdAt;
   final Timestamp? updatedAt;
+  final int leaveCount;
 
   RequestModel({
     String? id,
+    this.fileUrl,
     required this.userId,
     required this.userName,
     required this.userEmail,
@@ -43,10 +46,12 @@ class RequestModel {
     this.status = 'pending',
     this.createdAt,
     this.updatedAt,
+    this.leaveCount = 1,
   }) : id = id ?? DateTime.now().millisecondsSinceEpoch.toString();
 
   Map<String, dynamic> toJson() {
     return {
+      'fileUrl': fileUrl,
       'id': id,
       'userId': userId,
       'userName': userName,
@@ -65,20 +70,20 @@ class RequestModel {
       'fromDate': fromDate?.millisecondsSinceEpoch,
       'toDate': toDate?.millisecondsSinceEpoch,
       'status': status,
-      'createdAt': createdAt?.millisecondsSinceEpoch ?? DateTime.now().millisecondsSinceEpoch,
+      'createdAt':
+          createdAt?.millisecondsSinceEpoch ??
+          DateTime.now().millisecondsSinceEpoch,
       'updatedAt': updatedAt?.millisecondsSinceEpoch,
+      'leaveCount': leaveCount,
     };
   }
 
   factory RequestModel.fromJson(Map<String, dynamic> json) {
-    // ✅ FILE DATA SIZE CHECK - 300KB SE BARA NAHI HONA CHAHIYE
     String? fileData = json['fileData'];
     if (fileData != null && fileData.length > 300000) {
-      print('⚠️ File data too large in model: ${fileData.length} bytes');
       fileData = null;
     }
 
-    // ✅ TIMESTAMP HANDLING
     Timestamp? createdAt;
     if (json['createdAt'] is Timestamp) {
       createdAt = json['createdAt'];
@@ -94,6 +99,7 @@ class RequestModel {
     }
 
     return RequestModel(
+      fileUrl: json['fileUrl'],
       id: json['id'],
       userId: json['userId'],
       userName: json['userName'],
@@ -118,11 +124,12 @@ class RequestModel {
       status: json['status'] ?? 'pending',
       createdAt: createdAt,
       updatedAt: updatedAt,
+      leaveCount: json['leaveCount'] ?? 1,
     );
   }
 
   @override
   String toString() {
-    return 'RequestModel{id: $id, user: $userName, category: $category, status: $status}';
+    return 'RequestModel{id: $id, user: $userName, category: $category, status: $status, leaveCount: $leaveCount}';
   }
 }

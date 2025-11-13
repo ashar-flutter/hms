@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'dart:convert';
 import 'package:hr_flow/features/dashboard/requests/controller/status_controller.dart';
 import 'package:hr_flow/features/dashboard/requests/model/request_model.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/snackbar/custom_snackbar.dart';
 import '../../services/file_open_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AdminRequestsScreen extends StatelessWidget {
   final RequestStatusController controller = Get.put(RequestStatusController());
@@ -258,6 +261,7 @@ class AdminRequestsScreen extends StatelessWidget {
                     request.filePath!,
                     request.fileName,
                     request.fileData,
+                    request.fileUrl,
                   );
                 },
                 child: Container(
@@ -350,6 +354,11 @@ class AdminRequestsScreen extends StatelessWidget {
                     child: ElevatedButton.icon(
                       onPressed: () {
                         controller.rejectRequest(request.id);
+                        _returnLeaveBalance(
+                          request.id,
+                          request.leaveCount,
+                          request.userId,
+                        );
                         CustomSnackBar.show(
                           title: "Rejection",
                           message: "request has been rejected",
@@ -422,23 +431,203 @@ class AdminRequestsScreen extends StatelessWidget {
     );
   }
 
-  void _openFile(String filePath, String? fileName, String? fileData) async {
-    Get.dialog(
-      AlertDialog(
-        title: Text("File Info"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("File: ${fileOpenService.getFileName(filePath)}"),
-            SizedBox(height: 10),
-            Text("Path: $filePath"),
-            SizedBox(height: 10),
-            Text("Status: File saved locally"),
-          ],
+  void _openFile(
+    String filePath,
+    String? fileName,
+    String? fileData,
+    String? fileUrl,
+  ) async {
+    if (fileUrl != null && fileUrl.isNotEmpty) {
+      // Agar image hai toh preview dikhao aur browser option do
+      if (fileUrl.toLowerCase().contains('.jpg') ||
+          fileUrl.toLowerCase().contains('.jpeg') ||
+          fileUrl.toLowerCase().contains('.png') ||
+          fileUrl.toLowerCase().contains('.gif')) {
+        // Image preview with browser option
+        Get.dialog(
+          Dialog(
+            child: Container(
+              width: 350,
+              height: 500,
+              child: Column(
+                children: [
+                  // Header
+                  Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(12),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Image Preview",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => Get.back(),
+                          icon: Icon(Icons.close),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Image
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Image.network(
+                        fileUrl,
+                        fit: BoxFit.contain,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(child: CircularProgressIndicator());
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.error, color: Colors.red, size: 40),
+                                SizedBox(height: 10),
+                                Text("Failed to load image"),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+
+                  // Buttons
+                  Container(
+                    padding: EdgeInsets.all(12),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              // Browser mein open karein
+                              _launchInBrowser(fileUrl);
+                            },
+                            icon: Icon(Icons.open_in_browser, size: 18),
+                            label: Text("Open in Browser"),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              // Link copy karein
+                              _copyToClipboard(fileUrl);
+                            },
+                            icon: Icon(Icons.copy, size: 18),
+                            label: Text("Copy Link"),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      } else {
+        // Agar image nahi hai (PDF, Word, etc.) - PURANA SYSTEM BILKUL WAISA KA WAISA
+        Get.dialog(
+          AlertDialog(
+            title: Text("File Uploaded to Cloud"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text("File is stored in cloud storage"),
+                SizedBox(height: 10),
+                Text("Admin can view this file online"),
+                SizedBox(height: 10),
+                SelectableText(fileUrl, style: TextStyle(fontSize: 12)),
+              ],
+            ),
+            actions: [
+              TextButton(onPressed: () => Get.back(), child: Text("OK")),
+            ],
+          ),
+        );
+      }
+    } else {
+      // Agar fileUrl nahi hai - PURANA SYSTEM BILKUL WAISA KA WAISA
+      Get.dialog(
+        AlertDialog(
+          title: Text("File Info"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("File: ${fileOpenService.getFileName(filePath)}"),
+              SizedBox(height: 10),
+              Text("Path: $filePath"),
+              SizedBox(height: 10),
+              Text("Status: File saved locally"),
+            ],
+          ),
+          actions: [TextButton(onPressed: () => Get.back(), child: Text("OK"))],
         ),
-        actions: [TextButton(onPressed: () => Get.back(), child: Text("OK"))],
-      ),
-    );
+      );
+    }
+  }
+
+  Future<void> _launchInBrowser(String url) async {
+    try {
+      final uri = Uri.parse(url);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri);
+      }
+    } catch (e) {
+      //  - silent fail
+    }
+  }
+
+  void _copyToClipboard(String text) async {
+    try {
+      await Clipboard.setData(ClipboardData(text: text));
+      Get.back();
+    } catch (e) {
+      // - silent fail
+    }
+  }
+
+  void _returnLeaveBalance(
+    String requestId,
+    int leaveCount,
+    String userId,
+  ) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('leave_balance')
+          .doc(userId)
+          .update({
+            'annualBalance': FieldValue.increment(leaveCount),
+            'usedLeaves': FieldValue.increment(-leaveCount),
+            'monthlyUsed': FieldValue.increment(-leaveCount),
+            'weeklyUsed': FieldValue.increment(-leaveCount),
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
+    } catch (e) {
+      //
+    }
   }
 }

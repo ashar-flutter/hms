@@ -27,7 +27,7 @@ class HomeDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF8F9FA),
+      backgroundColor: Colors.white,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(70),
         child: AppBar(
@@ -75,47 +75,76 @@ class HomeDashboard extends StatelessWidget {
             ),
           ),
           actions: [
-            Obx(
-              () => Stack(
-                children: [
-                  Center(
-                    child: IconButton(
-                      icon: const Icon(
-                        size: 22,
-                        Icons.notifications,
-                        color: Colors.black,
-                      ),
-                      onPressed: () {
-                        Get.to(() => NotificationsScreen());
-                      },
-                    ),
-                  ),
-                  if (notificationController.unreadCount.value > 0)
-                    Positioned(
-                      right: 8,
-                      top: 8,
-                      child: Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        constraints: const BoxConstraints(
-                          minWidth: 18,
-                          minHeight: 18,
-                        ),
-                        child: Text(
-                          '${notificationController.unreadCount.value}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
+            Padding(
+              padding: const EdgeInsets.only(right: 25),
+              child: Obx(
+                () => Stack(
+                  children: [
+                    Center(
+                      child: GestureDetector(
+                        onTap: () {
+                          Get.to(() => NotificationsScreen());
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF3F4F6),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: const Color(0xFFE5E7EB),
+                              width: 1,
+                            ),
                           ),
-                          textAlign: TextAlign.center,
+                          child: IconButton(
+                            icon: const Icon(
+                              size: 24,
+                              Icons.notifications_outlined,
+                              color: Color(0xFF374151),
+                            ),
+
+                            onPressed: () {
+                              Get.to(() => NotificationsScreen());
+                            },
+                          ),
                         ),
                       ),
                     ),
-                ],
+                    if (notificationController.unreadCount.value > 0)
+                      Positioned(
+                        right: 6,
+                        top: 10,
+                        child: Container(
+                          padding: const EdgeInsets.all(3),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFEF4444),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 2),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.15),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 20,
+                            minHeight: 20,
+                          ),
+                          child: Center(
+                            child: Text(
+                              '${notificationController.unreadCount.value}',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                height: 1,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -139,7 +168,7 @@ class HomeDashboard extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: "bold",
                       color: Colors.black,
-                      fontSize: 16,
+                      fontSize: 15,
                     ),
                   ),
                 ),
@@ -153,7 +182,8 @@ class HomeDashboard extends StatelessWidget {
                       Get.to(() => AttendanceScreen());
                     },
                     text: "Attendance",
-                    imagePath: "assets/dashboard/futuristic_attendance_icon.svg",
+                    imagePath:
+                        "assets/dashboard/futuristic_attendance_icon.svg",
                   ),
                   CustomCard(
                     onTap: () {
@@ -213,33 +243,29 @@ class HomeDashboard extends StatelessWidget {
               ),
               const SizedBox(height: 15),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 15),
-                    child: Align(
-                      alignment: Alignment.topLeft,
-                      child: CustomCard(
-                        onTap: () {
-                          Get.to(() => Reports());
-                        },
-                        text: "Reports",
-                        imagePath: "assets/dashboard/futuristic_reports_icon.svg",
-                      ),
-                    ),
+                  CustomCard(
+                    onTap: () {
+                      Get.to(() => Reports());
+                    },
+                    text: "Reports",
+                    imagePath: "assets/dashboard/futuristic_reports_icon.svg",
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 15),
-                    child: Align(
-                      alignment: Alignment.topLeft,
-                      child: CustomCard(
-                        text: "Calendar",
-                        imagePath: "assets/dashboard/futuristic_calendar_icon.svg",
-                      ),
+                  CustomCard(
+                    text: "Announce..",
+                    imagePath: "assets/dashboard/announcements_icon_3d.svg",
+                  ),
+                  Container(
+                    height: 100,
+                    width: 100,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      color: Colors.transparent,
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: AppBar().preferredSize.height),
             ],
           ),
         ),

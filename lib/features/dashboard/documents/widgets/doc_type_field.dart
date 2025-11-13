@@ -12,10 +12,10 @@ class DocTypeField extends StatefulWidget {
 class _DocTypeFieldState extends State<DocTypeField> {
   String? selectedType;
   final List<String> types = [
-    "CV",
-    "Resume",
-    "Cover Letter",
-    "Reference Letter",
+    "Admin document",
+    "pdf",
+    "excel file",
+    "task file",
   ];
 
   @override
@@ -46,7 +46,7 @@ class _DocTypeFieldState extends State<DocTypeField> {
                   widget.hintText,
                   style: const TextStyle(
                     fontFamily: "poppins",
-                    fontSize: 16,
+                    fontSize: 14,
                     color: Colors.black,
                     fontWeight: FontWeight.w500,
                     letterSpacing: 0.3,
@@ -69,7 +69,7 @@ class _DocTypeFieldState extends State<DocTypeField> {
                         type,
                         style: const TextStyle(
                           fontFamily: "poppins",
-                          fontSize: 16,
+                          fontSize: 14,
                           color: Colors.black,
                           fontWeight: FontWeight.w500,
                           letterSpacing: 0.3,
@@ -86,7 +86,7 @@ class _DocTypeFieldState extends State<DocTypeField> {
                     type,
                     style: const TextStyle(
                       fontFamily: "poppins",
-                      fontSize: 16,
+                      fontSize: 13,
                       color: Colors.black,
                     ),
                   ),

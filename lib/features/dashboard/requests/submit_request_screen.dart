@@ -6,8 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hr_flow/features/dashboard/requests/request_submitted_dialog.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../core/snackbar/custom_snackbar.dart';
+import '../../admin_dashboard/services/lib/services/imgbb_service.dart';
 import '../main_dashboard.dart';
+import '../screens/leave_balance/service/leave_balance_service.dart';
+import '../screens/leave_balance/validator/leave_validator.dart';
 import 'controller/status_controller.dart';
 import 'controller/upload_controller.dart';
 import 'helper/dotted_box.dart';
@@ -64,9 +68,13 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
   }
 
   void _submitRequest(File? file) async {
+
+    int leaveCount = _calculateLeaveCount();
+    bool canProceed = await LeaveValidator.validateLeaveRequest(leaveCount);
+    if (!canProceed) return;
     String? fileName;
     String? fileData;
-
+    String? fileUrl;
     if (file != null) {
       final fileSize = await file.length();
 
@@ -83,6 +91,15 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
         );
         return;
       }
+      try {
+        final xFile = XFile(file.path);
+        print('🔄 Calling ImgBBService.uploadFile...');
+        fileUrl = await ImgBBService.uploadFile(xFile);
+        print('🟢 ImgBB Result: $fileUrl');
+      } catch (e) {
+        print('🔴 ImgBB Exception: $e');
+      }
+
 
       final compressedBytes = await _compressFileIfNeeded(file);
       fileData = base64Encode(compressedBytes);
@@ -105,13 +122,17 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
       filePath: file?.path,
       fileName: fileName,
       fileData: fileData,
+      fileUrl: fileUrl,
       fromDate: fromDate,
       toDate: toDate,
       status: 'pending',
       createdAt: Timestamp.now(),
+      leaveCount: leaveCount,
     );
 
     statusController.addRequest(newRequest);
+    await LeaveBalanceService.updateLeaveBalance(leaveCount);
+
 
     if (!mounted) return;
     showDialog(
@@ -141,6 +162,11 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
       borderColor: Colors.transparent,
       icon: Iconsax.message_tick,
     );
+  }
+  int _calculateLeaveCount() {
+    if (fromDate == null) return 1;
+    if (toDate == null) return 1;
+    return toDate!.difference(fromDate!).inDays + 1;
   }
 
   void selectOption(String option) {
@@ -174,13 +200,13 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
         child: AppBar(
           leading: IconButton(
             onPressed: () => Get.back(),
-            icon: const Icon(size: 20, Icons.arrow_back),
+            icon: const Icon(size: 18, Icons.arrow_back),
           ),
           centerTitle: true,
           title: const Text(
-            "Add New Request",
+            "Submit leave",
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 15,
               fontFamily: "bold",
               fontWeight: FontWeight.bold,
               color: Colors.black,
@@ -219,9 +245,9 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                   child: Text(
                     "Select days for leave",
                     style: TextStyle(
-                      fontSize: 17,
+                      fontSize: 14,
+                      fontFamily: "bold",
                       color: Colors.black,
-                      fontFamily: "poppins",
                     ),
                   ),
                 ),
@@ -261,7 +287,7 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                   const Text(
                     "For one day",
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 15,
                       fontFamily: "bold",
                       color: Colors.black,
                     ),
@@ -342,7 +368,6 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                         formatDate(fromDate),
                         style: TextStyle(
                           fontSize: 16,
-                          fontFamily: "poppins",
                           color: fromDate == null
                               ? Colors.grey.shade500
                               : Colors.black,
@@ -413,7 +438,6 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                         formatDate(toDate),
                         style: TextStyle(
                           fontSize: 16,
-                          fontFamily: "poppins",
                           color: toDate == null
                               ? Colors.grey.shade500
                               : Colors.black,
@@ -503,19 +527,9 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                 final file = uploadController.selectedFile.value;
                 return GestureDetector(
                   onTap: () => uploadController.uploadFile(),
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 22),
-                    padding: const EdgeInsets.all(20),
-                    height: 180,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(25),
-                      border: Border.all(color: Colors.grey, width: 2),
-                      color: Colors.white,
-                    ),
-                    child: DottedBorderBox(
-                      file: file,
-                      controller: uploadController,
-                    ),
+                  child: DottedBorderBox(
+                    file: file,
+                    controller: uploadController,
                   ),
                 );
               }),

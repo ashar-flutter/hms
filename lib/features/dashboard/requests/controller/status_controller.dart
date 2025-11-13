@@ -25,10 +25,8 @@ class RequestStatusController extends GetxController {
         .snapshots()
         .listen((snapshot) {
       requests.value = snapshot.docs.map((doc) {
-        print('🔄 New request received: ${doc.data()['userName']}');
         return RequestModel.fromJson(doc.data());
       }).toList();
-      print('📂 Total requests: ${requests.length}');
     });
   }
 
@@ -65,11 +63,9 @@ class RequestStatusController extends GetxController {
 
       String? safeFileData = request.fileData;
       if (safeFileData != null && safeFileData.length > 300000) {
-        print('⚠️ File data too large: ${safeFileData.length} bytes, truncating...');
         safeFileData = null;
       }
 
-      // ✅ PEHLE SIMPLE MAP BANAO BINA FieldValue KE
       Map<String, dynamic> simpleData = {
         'id': request.id,
         'userId': request.userId,
@@ -86,24 +82,22 @@ class RequestStatusController extends GetxController {
         'filePath': request.filePath,
         'fileName': request.fileName,
         'fileData': safeFileData,
+        'fileUrl': request.fileUrl,
         'fromDate': request.fromDate?.millisecondsSinceEpoch,
         'toDate': request.toDate?.millisecondsSinceEpoch,
         'status': request.status,
-        'createdAt': DateTime.now().millisecondsSinceEpoch, // ✅ Timestamp ki jagah milliseconds
+        'createdAt': DateTime.now().millisecondsSinceEpoch,
       };
 
-      // ✅ SIZE CHECK
       final jsonString = jsonEncode(simpleData);
       if (jsonString.length > 1000000) {
-        print('❌ Request too large: ${jsonString.length} bytes, removing file data');
         simpleData['fileData'] = null;
         simpleData['fileName'] = null;
       }
 
-      // ✅ AB FIRESTORE MEIN SAVE KARO WITH FieldValue
       final firestoreData = {
         ...simpleData,
-        'createdAt': FieldValue.serverTimestamp(), // ✅ Yahan FieldValue use karo
+        'createdAt': FieldValue.serverTimestamp(),
       };
 
       await _firestore
@@ -111,9 +105,7 @@ class RequestStatusController extends GetxController {
           .doc(request.id)
           .set(firestoreData);
 
-      print('✅ Request saved successfully: ${request.id}');
     } catch (e) {
-      print('❌ Error saving request: $e');
       if (e.toString().contains('exceeds the maximum allowed size')) {
         await _saveWithoutFileData(request);
       }
@@ -140,6 +132,7 @@ class RequestStatusController extends GetxController {
         'filePath': null,
         'fileName': null,
         'fileData': null,
+        'fileUrl': request.fileUrl,
         'fromDate': request.fromDate?.millisecondsSinceEpoch,
         'toDate': request.toDate?.millisecondsSinceEpoch,
         'status': request.status,
@@ -151,9 +144,8 @@ class RequestStatusController extends GetxController {
           .doc(request.id)
           .set(requestData);
 
-      print('✅ Request saved without file data: ${request.id}');
     } catch (e) {
-      print('❌ Error saving without file data: $e');
+    //
     }
   }
 
@@ -185,7 +177,9 @@ class RequestStatusController extends GetxController {
         type: 'approval',
         requestId: requestId,
       );
-    } catch (e) {}
+    } catch (e) {
+    //
+    }
   }
 
   Future<void> rejectRequest(String requestId) async {
@@ -204,7 +198,9 @@ class RequestStatusController extends GetxController {
         type: 'rejection',
         requestId: requestId,
       );
-    } catch (e) {}
+    } catch (e) {
+    //
+    }
   }
 
   Future<void> _createNotification({
@@ -232,6 +228,8 @@ class RequestStatusController extends GetxController {
           .collection(_notificationsCollection)
           .doc(notificationId)
           .set(notificationData);
-    } catch (e) {}
+    } catch (e) {
+    //
+    }
   }
 }

@@ -108,7 +108,7 @@ class _MainAdminDashboardState extends State<MainAdminDashboard> {
                 DashboardCard(
                   onTap: () => Get.to(() => EmployeeList()),
                   text: "Employees",
-                  imagePath: "assets/dashboard/attendance.png",
+                  imagePath: "assets/dashboard/employee_card_3d.svg",
                 ),
                 Obx(() {
                   final activeCount =
@@ -119,7 +119,7 @@ class _MainAdminDashboardState extends State<MainAdminDashboard> {
                       DashboardCard(
                         onTap: _navigateToActiveEmployees,
                         text: "Active Today",
-                        imagePath: "assets/dashboard/attendance.png",
+                        imagePath: "assets/dashboard/active_employee_3d.svg",
                       ),
                       if (activeCount > 0)
                         Positioned(
@@ -130,7 +130,7 @@ class _MainAdminDashboardState extends State<MainAdminDashboard> {
                             child: Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: Colors.red,
+                                color: Colors.lightGreen.shade900,
                                 shape: BoxShape.circle,
                                 border: Border.all(
                                   color: Colors.white,
@@ -173,7 +173,7 @@ class _MainAdminDashboardState extends State<MainAdminDashboard> {
                       DashboardCard(
                         onTap: _navigateToRequests,
                         text: "Requests",
-                        imagePath: "assets/dashboard/requests.png",
+                        imagePath: "assets/dashboard/futuristic_leave_icon.svg",
                       ),
                       if (pendingCount > 0)
                         Positioned(
@@ -213,7 +213,7 @@ class _MainAdminDashboardState extends State<MainAdminDashboard> {
                       DashboardCard(
                         onTap: () => Get.to(() => EmployeeDocuments()),
                         text: "Documents",
-                        imagePath: "assets/dashboard/documents.png",
+                        imagePath: "assets/dashboard/heavy_document_icon.svg",
                       ),
                       if (docPendingCount > 0)
                         Positioned(

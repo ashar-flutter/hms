@@ -42,13 +42,7 @@ class SettingsPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          _buildSettingItem("Change Password", Icons.lock, () {
-            _showInfoDialog(
-              context,
-              "Change Password",
-              "To change your password, please contact the HR department. They will assist you with the password reset process and ensure your account security.",
-            );
-          }),
+
           _buildSettingItem("Notification Settings", Icons.notifications, () {
             _showInfoDialog(
               context,

@@ -94,34 +94,47 @@ class _CustomCardState extends State<CustomCard>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    padding: EdgeInsets.all(10),
+                    padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Color(0xFFF5F5F5),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Color(0xFFF8F8F8),
+                          Color(0xFFE8E8E8),
+                        ],
+                      ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
-                          blurRadius: 8,
+                          color: Colors.black.withValues(alpha: 0.15),
+                          blurRadius: 12,
                           spreadRadius: 1,
-                          offset: Offset(0, 3),
+                          offset: Offset(0, 4),
+                        ),
+                        BoxShadow(
+                          color: Colors.white.withValues(alpha: 0.6),
+                          blurRadius: 8,
+                          spreadRadius: 0,
+                          offset: Offset(-2, -2),
                         ),
                       ],
                     ),
                     child: SvgPicture.asset(
                       widget.imagePath,
-                      height: 35,
-                      width: 35,
+                      height: 50,
+                      width: 50,
                       fit: BoxFit.contain,
                     ),
                   ),
-                  SizedBox(height: 6),
+                  SizedBox(height: 3),
                   Text(
                     widget.text,
                     style: TextStyle(
                       fontFamily: "poppins",
-                      fontWeight: FontWeight.w700,
-                      color: Colors.grey,
-                      fontSize: 13,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black,
+                      fontSize: 12,
                     ),
                   ),
                 ],

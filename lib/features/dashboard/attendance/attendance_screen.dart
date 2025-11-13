@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hr_flow/core/colors/gradients.dart';
 import 'package:hr_flow/features/dashboard/attendance/position/position.dart';
+import 'package:hr_flow/features/dashboard/attendance/service/secure_attendance_service.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:intl/intl.dart';
@@ -22,6 +23,7 @@ class AttendanceScreen extends StatefulWidget {
 
 class _AttendanceScreenState extends State<AttendanceScreen>
     with SingleTickerProviderStateMixin {
+
   late AttendanceController _controller;
   bool isCheck = true;
   Duration _workDuration = Duration.zero;
@@ -40,6 +42,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
   late AttendanceService attendanceService;
   late CheckController _checkController;
   StreamSubscription<LatLng>? _positionStreamSub;
+  final SecureAttendanceService _secureService = SecureAttendanceService();
 
   @override
   void initState() {
@@ -52,12 +55,16 @@ class _AttendanceScreenState extends State<AttendanceScreen>
       vsync: this,
       duration: const Duration(seconds: 1),
     )..repeat(reverse: true);
-    _animation = Tween<double>(begin: 0, end: 12)
-        .animate(CurvedAnimation(parent: controller, curve: Curves.easeInOut));
+    _animation = Tween<double>(
+      begin: 0,
+      end: 12,
+    ).animate(CurvedAnimation(parent: controller, curve: Curves.easeInOut));
     _restorePreviousState();
     attendanceService.checkPermission().then((granted) {
       if (granted) {
-        _positionStreamSub = attendanceService.getPositionStream().listen((pos) {
+        _positionStreamSub = attendanceService.getPositionStream().listen((
+          pos,
+        ) {
           if (mounted) {
             setState(() {
               _currentPosition = pos;
@@ -87,26 +94,47 @@ class _AttendanceScreenState extends State<AttendanceScreen>
       });
     }
   }
+
   Future<void> _restoreBreakState() async {
-    final breakStatus = await _controller.getBreakStatus();
-    final breakDuration = await _controller.getBreakDuration();
-    if (mounted) {
-      setState(() {
-        isOnBreak = breakStatus;
-        _breakDuration = breakDuration;
-      });
-    }
-    if (isOnBreak) {
-      _breakStartTime = DateTime.now().subtract(_breakDuration);
-      _breakTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+    try {
+      final isOnBreakStored = await _secureService.isOnBreak();
+      final breakStartTimeStored = await _secureService.getBreakStartTime();
+
+      if (isOnBreakStored && breakStartTimeStored != null) {
         if (mounted) {
           setState(() {
-            _breakDuration = DateTime.now().difference(_breakStartTime!);
+            isOnBreak = true;
+            _breakStartTime = breakStartTimeStored;
+            _breakDuration = DateTime.now().difference(breakStartTimeStored);
           });
         }
-      });
+
+        _breakTimer?.cancel();
+        _breakTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+          if (mounted) {
+            setState(() {
+              _breakDuration = DateTime.now().difference(_breakStartTime!);
+            });
+          }
+        });
+      } else {
+        if (mounted) {
+          setState(() {
+            isOnBreak = false;
+            _breakDuration = Duration.zero;
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          isOnBreak = false;
+          _breakDuration = Duration.zero;
+        });
+      }
     }
   }
+
   @override
   void dispose() {
     controller.dispose();
@@ -162,14 +190,15 @@ class _AttendanceScreenState extends State<AttendanceScreen>
       } else {
         _workTimer?.cancel();
         _checkOutTime = DateFormat('hh:mm:ss a').format(DateTime.now());
+        final finalBreakDuration = _breakDuration;
         _controller.checkOut();
         secureController.checkOut();
-        _controller.saveBreakState(false, _breakDuration);
+        _controller.saveBreakState(isOnBreak, finalBreakDuration);
         if (_currentPosition != null) {
           _checkController.recordCheck(
             isCheckIn: false,
             workDuration: _workDuration,
-            breakDuration: _breakDuration,
+            breakDuration: finalBreakDuration,
             currentPosition: _currentPosition!,
             existingCheckInTime: _checkInTime,
           );
@@ -177,6 +206,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
       }
     });
   }
+
   Future<void> _toggleBreak() async {
     if (!_canCheckIn) {
       CustomSnackBar.show(
@@ -198,6 +228,8 @@ class _AttendanceScreenState extends State<AttendanceScreen>
 
     if (!wasOnBreak && isOnBreak) {
       _breakStartTime = DateTime.now();
+      await _secureService.saveBreakStartTime(_breakStartTime!);
+      await _secureService.saveBreakStatus(true);
       _breakTimer?.cancel();
       _breakTimer = Timer.periodic(const Duration(seconds: 1), (_) {
         if (mounted) {
@@ -206,26 +238,41 @@ class _AttendanceScreenState extends State<AttendanceScreen>
           });
         }
       });
+
+      if (_currentPosition != null && _checkInDate != null) {
+        await _checkController.recordBreak(
+          isOnBreak: true,
+          workDuration: _workDuration,
+          breakDuration: _breakDuration,
+          currentPosition: _currentPosition!,
+          date: _checkInDate!,
+          checkInTime: _checkInTime,
+          checkOutTime: _checkOutTime,
+        );
+      }
     } else if (wasOnBreak && !isOnBreak) {
       _breakTimer?.cancel();
       final currentBreakDuration = DateTime.now().difference(_breakStartTime!);
       _breakDuration = currentBreakDuration;
+      await _secureService.saveBreakStatus(false);
+      await _secureService.clearBreakData();
+
+      if (_currentPosition != null && _checkInDate != null) {
+        await _checkController.recordBreak(
+          isOnBreak: false,
+          workDuration: _workDuration,
+          breakDuration: _breakDuration,
+          currentPosition: _currentPosition!,
+          date: _checkInDate!,
+          checkInTime: _checkInTime,
+          checkOutTime: _checkOutTime,
+        );
+      }
     }
 
     await _controller.saveBreakState(isOnBreak, _breakDuration);
-
-    if (_currentPosition != null && _checkInDate != null) {
-      _checkController.recordBreak(
-        isOnBreak: isOnBreak,
-        workDuration: _workDuration,
-        breakDuration: _breakDuration,
-        currentPosition: _currentPosition!,
-        date: _checkInDate!,
-        checkInTime: _checkInTime,
-        checkOutTime: _checkOutTime,
-      );
-    }
   }
+
   String _formatDuration(Duration d) {
     final h = d.inHours.toString().padLeft(2, '0');
     final m = (d.inMinutes % 60).toString().padLeft(2, '0');
@@ -238,11 +285,26 @@ class _AttendanceScreenState extends State<AttendanceScreen>
     final screenHeight = MediaQuery.of(context).size.height;
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            onPressed: () {},
+            icon: Icon(Icons.arrow_back, color: Colors.black, size: 18),
+          ),
+          centerTitle: true,
+          title: Text(
+            "Attendance",
+            style: TextStyle(
+              fontFamily: "bold",
+              color: Colors.black,
+              fontSize: 14,
+            ),
+          ),
+        ),
         backgroundColor: Colors.grey.shade300,
         body: Stack(
           children: [
             SizedBox(
-              height: screenHeight * 0.5,
+              height: screenHeight * 0.6,
               width: double.infinity,
               child: Custom_Map(fixedPosition: _fixedPosition),
             ),

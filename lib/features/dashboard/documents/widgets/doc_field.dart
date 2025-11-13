@@ -24,7 +24,7 @@ class DocField extends StatelessWidget {
         onEditingComplete: () => FocusScope.of(context).unfocus(),
         style: const TextStyle(
           fontFamily: "poppins",
-          fontSize: 16,
+          fontSize: 13,
           color: Colors.black,
           fontWeight: FontWeight.w500,
           letterSpacing: 0.3,
@@ -34,7 +34,9 @@ class DocField extends StatelessWidget {
           hintText: text,
           filled: true,
           fillColor: Colors.white,
-          hintStyle: TextStyle(color: Colors.grey.shade900, fontSize: 15),
+          hintStyle: TextStyle(color: Colors.grey.shade900, fontSize: 13,
+          fontFamily: "poppins"
+          ),
           contentPadding:
           const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           enabledBorder: OutlineInputBorder(
