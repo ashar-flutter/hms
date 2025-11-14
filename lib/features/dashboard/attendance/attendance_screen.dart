@@ -23,7 +23,6 @@ class AttendanceScreen extends StatefulWidget {
 
 class _AttendanceScreenState extends State<AttendanceScreen>
     with SingleTickerProviderStateMixin {
-
   late AttendanceController _controller;
   bool isCheck = true;
   Duration _workDuration = Duration.zero;
@@ -32,6 +31,10 @@ class _AttendanceScreenState extends State<AttendanceScreen>
   Duration _breakDuration = Duration.zero;
   Timer? _breakTimer;
   DateTime? _breakStartTime;
+
+  // 🆕 TOTAL BREAK TRACK KARNE KE LIYE
+  Duration _totalBreakDuration = Duration.zero;
+
   final LatLng _fixedPosition = const LatLng(31.4686680, 74.3122560);
   late AnimationController controller;
   late Animation<double> _animation;
@@ -99,6 +102,14 @@ class _AttendanceScreenState extends State<AttendanceScreen>
     try {
       final isOnBreakStored = await _secureService.isOnBreak();
       final breakStartTimeStored = await _secureService.getBreakStartTime();
+      final totalBreakStored = await _secureService
+          .getTotalBreakDuration(); // 🆕 TOTAL BREAK LOAD
+
+      if (mounted) {
+        setState(() {
+          _totalBreakDuration = totalBreakStored; // 🆕 TOTAL BREAK RESTORE
+        });
+      }
 
       if (isOnBreakStored && breakStartTimeStored != null) {
         if (mounted) {
@@ -121,7 +132,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
         if (mounted) {
           setState(() {
             isOnBreak = false;
-            _breakDuration = Duration.zero;
+            _breakDuration = _totalBreakDuration; // 🆕 TOTAL BREAK SHOW
           });
         }
       }
@@ -129,7 +140,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
       if (mounted) {
         setState(() {
           isOnBreak = false;
-          _breakDuration = Duration.zero;
+          _breakDuration = _totalBreakDuration; // 🆕 TOTAL BREAK SHOW
         });
       }
     }
@@ -190,7 +201,17 @@ class _AttendanceScreenState extends State<AttendanceScreen>
       } else {
         _workTimer?.cancel();
         _checkOutTime = DateFormat('hh:mm:ss a').format(DateTime.now());
-        final finalBreakDuration = _breakDuration;
+
+        // 🎯 FINAL BREAK CALCULATION
+        Duration finalBreakDuration;
+        if (isOnBreak) {
+          // Agar break chalti hue checkout kiya
+          finalBreakDuration = _totalBreakDuration + _breakDuration;
+        } else {
+          // Agar break end karne ke baad checkout kiya
+          finalBreakDuration = _totalBreakDuration;
+        }
+
         _controller.checkOut();
         secureController.checkOut();
         _controller.saveBreakState(isOnBreak, finalBreakDuration);
@@ -198,11 +219,15 @@ class _AttendanceScreenState extends State<AttendanceScreen>
           _checkController.recordCheck(
             isCheckIn: false,
             workDuration: _workDuration,
-            breakDuration: finalBreakDuration,
+            breakDuration: finalBreakDuration, // 🎯 TOTAL BREAK DURATION
             currentPosition: _currentPosition!,
             existingCheckInTime: _checkInTime,
           );
         }
+
+        // 🎯 RESET FOR NEXT DAY
+        _totalBreakDuration = Duration.zero;
+        _secureService.clearTotalBreak();
       }
     });
   }
@@ -227,6 +252,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
     setState(() => isOnBreak = !isOnBreak);
 
     if (!wasOnBreak && isOnBreak) {
+      // BREAK START
       _breakStartTime = DateTime.now();
       await _secureService.saveBreakStartTime(_breakStartTime!);
       await _secureService.saveBreakStatus(true);
@@ -251,9 +277,16 @@ class _AttendanceScreenState extends State<AttendanceScreen>
         );
       }
     } else if (wasOnBreak && !isOnBreak) {
+      // BREAK END - 🎯 YAHAN FIX KIA HAI
       _breakTimer?.cancel();
       final currentBreakDuration = DateTime.now().difference(_breakStartTime!);
-      _breakDuration = currentBreakDuration;
+
+      // 🎯 CRITICAL FIX: TOTAL BREAK UPDATE KARO
+      _totalBreakDuration += currentBreakDuration;
+
+      // 🎯 SECURE STORAGE MEIN SAVE KARO
+      await _secureService.saveTotalBreakDuration(_totalBreakDuration);
+
       await _secureService.saveBreakStatus(false);
       await _secureService.clearBreakData();
 
@@ -261,7 +294,7 @@ class _AttendanceScreenState extends State<AttendanceScreen>
         await _checkController.recordBreak(
           isOnBreak: false,
           workDuration: _workDuration,
-          breakDuration: _breakDuration,
+          breakDuration: currentBreakDuration, // 🎯 CURRENT BREAK TIME
           currentPosition: _currentPosition!,
           date: _checkInDate!,
           checkInTime: _checkInTime,

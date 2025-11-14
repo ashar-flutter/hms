@@ -22,6 +22,30 @@ class CheckService {
     final userDoc = await _firestore.collection('users').doc(currentUid).get();
     final userData = userDoc.data() ?? {};
 
+    // 🎯 CRITICAL FIX: BREAK DURATION OVERWRITE SE BACHANE KE LIYE
+    final existingDoc = await _firestore
+        .collection('attendance')
+        .doc(currentUid)
+        .collection('records')
+        .doc(date)
+        .get();
+
+    String finalBreakDuration = breakDuration;
+
+    // Agar existing document hai aur usme break duration already hai
+    if (existingDoc.exists) {
+      final existingData = existingDoc.data();
+      final existingBreakDuration = existingData?['breakDuration'] as String?;
+
+      // Agar existing break duration zero nahi hai aur new break duration zero hai
+      // Toh existing break duration ko preserve karo
+      if (existingBreakDuration != null &&
+          existingBreakDuration != "00:00:00" &&
+          breakDuration == "00:00:00") {
+        finalBreakDuration = existingBreakDuration;
+      }
+    }
+
     await _firestore
         .collection('attendance')
         .doc(currentUid)
@@ -36,7 +60,7 @@ class CheckService {
       'checkInTime': checkInTime,
       'checkOutTime': checkOutTime,
       'workDuration': workDuration,
-      'breakDuration': breakDuration,
+      'breakDuration': finalBreakDuration,
       'status': status,
       'location': {
         'lat': lat,
