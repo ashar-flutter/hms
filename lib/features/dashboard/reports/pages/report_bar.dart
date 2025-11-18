@@ -35,7 +35,9 @@ class ReportBarWithCallback extends StatelessWidget {
               child: Container(
                 margin: EdgeInsets.all(5),
                 decoration: BoxDecoration(
-                  color: isPerformanceSelected ? Color(0xFF5038ED) : Colors.white,
+                  color: isPerformanceSelected
+                      ? Color(0xFF006400)
+                      : Colors.white,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 alignment: Alignment.center,
@@ -55,7 +57,9 @@ class ReportBarWithCallback extends StatelessWidget {
               child: Container(
                 margin: EdgeInsets.all(5),
                 decoration: BoxDecoration(
-                  color: isPerformanceSelected ? Colors.white : Color(0xFF5038ED),
+                  color: isPerformanceSelected
+                      ? Colors.white
+                      : Color(0xFF006400),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 alignment: Alignment.center,

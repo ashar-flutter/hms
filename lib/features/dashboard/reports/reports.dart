@@ -30,7 +30,8 @@ class _ReportsState extends State<Reports> {
   }
 
   Future<void> _loadData() async {
-    final performanceData = await _performanceController.getUserPerformanceData();
+    final performanceData = await _performanceController
+        .getUserPerformanceData();
     final reportsData = await _reportsController.getUserReports();
 
     if (mounted) {
@@ -49,18 +50,18 @@ class _ReportsState extends State<Reports> {
     final todayStr = DateFormat('yyyy-MM-dd').format(DateTime.now());
     try {
       return _performanceData.firstWhere(
-            (data) => data['date'] == todayStr,
+        (data) => data['date'] == todayStr,
         orElse: () => {
           'checkInTime': null,
           'checkOutTime': null,
-          'workDuration': '0:00'
+          'workDuration': '0:00',
         },
       );
     } catch (e) {
       return {
         'checkInTime': null,
         'checkOutTime': null,
-        'workDuration': '0:00'
+        'workDuration': '0:00',
       };
     }
   }
@@ -70,12 +71,18 @@ class _ReportsState extends State<Reports> {
     final checkInTime = todayData['checkInTime'];
     final checkOutTime = todayData['checkOutTime'];
 
-    final progress = PerformanceHelper.calculateLiveProgress(checkInTime, checkOutTime);
-    final workedHours = PerformanceHelper.parseWorkDuration(todayData['workDuration'] ?? '0:00');
+    final progress = PerformanceHelper.calculateLiveProgress(
+      checkInTime,
+      checkOutTime,
+    );
+    final workedHours = PerformanceHelper.parseWorkDuration(
+      todayData['workDuration'] ?? '0:00',
+    );
 
     return Column(
       children: [
         Container(
+          margin: EdgeInsets.zero,
           width: 140,
           height: 140,
           child: Stack(
@@ -86,9 +93,11 @@ class _ReportsState extends State<Reports> {
                 strokeWidth: 14,
                 backgroundColor: Colors.grey.shade300,
                 valueColor: AlwaysStoppedAnimation<Color>(
-                  progress >= 90 ? Color(0xFF10B981) :
-                  progress >= 50 ? Color(0xFFF59E0B) :
-                  Color(0xFFEF4444),
+                  progress >= 90
+                      ? Color(0xFF10B981)
+                      : progress >= 50
+                      ? Color(0xFFF59E0B)
+                      : Color(0xFFEF4444),
                 ),
               ),
               Column(
@@ -214,19 +223,21 @@ class _ReportsState extends State<Reports> {
                     SizedBox(height: 6),
                     Container(
                       width: 28,
-                      height: barHeight > minBarHeight ? barHeight : minBarHeight,
+                      height: barHeight > minBarHeight
+                          ? barHeight
+                          : minBarHeight,
                       decoration: BoxDecoration(
                         gradient: isToday
                             ? LinearGradient(
-                          colors: [Color(0xFF10B981), Color(0xFF34D399)],
-                          begin: Alignment.bottomCenter,
-                          end: Alignment.topCenter,
-                        )
+                                colors: [Color(0xFF10B981), Color(0xFF34D399)],
+                                begin: Alignment.bottomCenter,
+                                end: Alignment.topCenter,
+                              )
                             : LinearGradient(
-                          colors: [Color(0xFF3B82F6), Color(0xFF60A5FA)],
-                          begin: Alignment.bottomCenter,
-                          end: Alignment.topCenter,
-                        ),
+                                colors: [Color(0xFF3B82F6), Color(0xFF60A5FA)],
+                                begin: Alignment.bottomCenter,
+                                end: Alignment.topCenter,
+                              ),
                         borderRadius: BorderRadius.vertical(
                           top: Radius.circular(6),
                         ),
@@ -240,7 +251,9 @@ class _ReportsState extends State<Reports> {
                           style: TextStyle(
                             fontFamily: "bold",
                             fontSize: 13,
-                            color: isToday ? Color(0xFF10B981) : Colors.grey.shade700,
+                            color: isToday
+                                ? Color(0xFF10B981)
+                                : Colors.grey.shade700,
                           ),
                         ),
                         Text(
@@ -331,7 +344,11 @@ class _ReportsState extends State<Reports> {
                 ),
               ),
               SizedBox(width: 8),
-              Icon(Icons.arrow_upward_rounded, size: 16, color: Color(0xFF10B981)),
+              Icon(
+                Icons.arrow_upward_rounded,
+                size: 16,
+                color: Color(0xFF10B981),
+              ),
               SizedBox(width: 8),
               Text(
                 "GROWN",
@@ -496,9 +513,11 @@ class _ReportsState extends State<Reports> {
                 strokeWidth: 8,
                 backgroundColor: Colors.grey.shade300,
                 valueColor: AlwaysStoppedAnimation<Color>(
-                  percentage >= 90 ? Color(0xFF10B981) :
-                  percentage >= 70 ? Color(0xFFF59E0B) :
-                  Color(0xFFEF4444),
+                  percentage >= 90
+                      ? Color(0xFF10B981)
+                      : percentage >= 70
+                      ? Color(0xFFF59E0B)
+                      : Color(0xFFEF4444),
                 ),
               ),
               Text(
@@ -539,7 +558,9 @@ class _ReportsState extends State<Reports> {
       );
     }
 
-    final monthlyMetrics = PerformanceHelper.calculateLiveMonthlyMetrics(_performanceData);
+    final monthlyMetrics = PerformanceHelper.calculateLiveMonthlyMetrics(
+      _performanceData,
+    );
     final weeklyData = PerformanceHelper.getWeeklyPunctuality(_performanceData);
 
     return SingleChildScrollView(
@@ -593,7 +614,10 @@ class _ReportsState extends State<Reports> {
     }
 
     final currentDate = _attendanceDates[_currentDateIndex];
-    final todayReport = ReportsHelper.findReportForDate(_reportsData, currentDate);
+    final todayReport = ReportsHelper.findReportForDate(
+      _reportsData,
+      currentDate,
+    );
 
     return Column(
       children: [
@@ -660,54 +684,54 @@ class _ReportsState extends State<Reports> {
         Expanded(
           child: todayReport == null
               ? Center(
-            child: Text(
-              "No report available for this date",
-              style: TextStyle(
-                fontFamily: "poppins",
-                fontSize: 16,
-                color: Colors.grey.shade600,
-              ),
-            ),
-          )
+                  child: Text(
+                    "No report available for this date",
+                    style: TextStyle(
+                      fontFamily: "poppins",
+                      fontSize: 16,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                )
               : ListView(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            children: [
-              _buildReportCard(
-                title: "Check In Time",
-                value: todayReport['checkInTime'] ?? 'N/A',
-                icon: Icons.login_rounded,
-                color: Color(0xFF10B981),
-              ),
-              SizedBox(height: 12),
-              _buildReportCard(
-                title: "Check Out Time",
-                value: todayReport['checkOutTime'] ?? 'N/A',
-                icon: Icons.logout_rounded,
-                color: Color(0xFFEF4444),
-              ),
-              SizedBox(height: 12),
-              _buildReportCard(
-                title: "Work Duration",
-                value: todayReport['workDuration'] ?? '00:00:00',
-                icon: Icons.access_time_rounded,
-                color: Color(0xFF5038ED),
-              ),
-              SizedBox(height: 12),
-              _buildReportCard(
-                title: "Break Duration",
-                value: todayReport['breakDuration'] ?? '00:00:00',
-                icon: Icons.free_breakfast_rounded,
-                color: Color(0xFFF59E0B),
-              ),
-              SizedBox(height: 12),
-              _buildReportCard(
-                title: "Status",
-                value: todayReport['status'] ?? 'N/A',
-                icon: Icons.work_history_rounded,
-                color: Color(0xFF8B5CF6),
-              ),
-            ],
-          ),
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  children: [
+                    _buildReportCard(
+                      title: "Check In Time",
+                      value: todayReport['checkInTime'] ?? 'N/A',
+                      icon: Icons.login_rounded,
+                      color: Color(0xFF10B981),
+                    ),
+                    SizedBox(height: 12),
+                    _buildReportCard(
+                      title: "Check Out Time",
+                      value: todayReport['checkOutTime'] ?? 'N/A',
+                      icon: Icons.logout_rounded,
+                      color: Color(0xFFEF4444),
+                    ),
+                    SizedBox(height: 12),
+                    _buildReportCard(
+                      title: "Work Duration",
+                      value: todayReport['workDuration'] ?? '00:00:00',
+                      icon: Icons.access_time_rounded,
+                      color: Color(0xFF5038ED),
+                    ),
+                    SizedBox(height: 12),
+                    _buildReportCard(
+                      title: "Break Duration",
+                      value: todayReport['breakDuration'] ?? '00:00:00',
+                      icon: Icons.free_breakfast_rounded,
+                      color: Color(0xFFF59E0B),
+                    ),
+                    SizedBox(height: 12),
+                    _buildReportCard(
+                      title: "Status",
+                      value: todayReport['status'] ?? 'N/A',
+                      icon: Icons.work_history_rounded,
+                      color: Color(0xFF8B5CF6),
+                    ),
+                  ],
+                ),
         ),
       ],
     );
@@ -823,7 +847,9 @@ class _ReportsState extends State<Reports> {
             },
           ),
           Expanded(
-            child: isPerformanceSelected ? _buildPerformanceView() : _buildReportsView(),
+            child: isPerformanceSelected
+                ? _buildPerformanceView()
+                : _buildReportsView(),
           ),
         ],
       ),

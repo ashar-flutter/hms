@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hr_flow/core/colors/app_colors.dart';
 import 'package:hr_flow/features/onboarding/main_page.dart';
 import 'package:hr_flow/features/profile/profile_page.dart';
 import 'package:hr_flow/features/dashboard/main_dashboard.dart';
@@ -16,121 +15,95 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
+class _SplashScreenState extends State<SplashScreen> {
+  bool _controllersRegistered = false;
 
   @override
   void initState() {
     super.initState();
-    if (!Get.isRegistered<RequestStatusController>()) {
+    // **OPTIMIZATION 2: Sync operations first**
+    _registerControllersSync();
+    // **OPTIMIZATION 3: Microtask for immediate execution**
+    Future.microtask(_navigateUserFast);
+  }
+
+  void _registerControllersSync() {
+    if (!_controllersRegistered) {
       Get.put(RequestStatusController(), permanent: true);
-    }
-    if (!Get.isRegistered<NotificationController>()) {
       Get.put(NotificationController(), permanent: true);
+      _controllersRegistered = true;
     }
-
-    print('🚀 All controllers initialized');
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1800),
-    );
-
-    _fadeAnimation = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOut,
-    );
-
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0.6, 0),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
-
-    _controller.forward();
-
-    _controller.addStatusListener((status) async {
-      if (status == AnimationStatus.completed) {
-        await Future.delayed(const Duration(milliseconds: 400));
-        await _navigateUser();
-      }
-    });
   }
 
-  Future<void> _navigateUser() async {
-    final isLoggedIn = await SecureStorageService.isLoggedIn();
-    final isProfileCompleted = await SecureStorageService.isProfileCompleted();
-    final userRole = await SecureStorageService.getUserRole();
+  Future<void> _navigateUserFast() async {
+    try {
+      final results = await Future.wait([
+        SecureStorageService.isLoggedIn(),
+        SecureStorageService.isProfileCompleted(),
+        SecureStorageService.getUserRole(),
+      ], eagerError: true);
 
-    debugPrint("isLoggedIn: $isLoggedIn");
-    debugPrint("isProfileCompleted: $isProfileCompleted");
-    debugPrint("userRole: $userRole");
+      _navigateBasedOnAuth(
+        results[0] as bool,
+        results[1] as bool,
+        results[2] as String?,
+      );
+    } catch (e) {
+      Get.offAll(() => const MainPage(), transition: Transition.noTransition);
+    }
+  }
 
+  void _navigateBasedOnAuth(bool isLoggedIn, bool isProfileCompleted, String? userRole) {
     if (!isLoggedIn) {
-      Get.offAll(
-        () => const MainPage(),
-        transition: Transition.fadeIn,
-        duration: const Duration(milliseconds: 500),
-      );
-      return;
+      Get.offAll(() => const MainPage(), transition: Transition.noTransition);
+    } else if (!isProfileCompleted) {
+      Get.offAll(() => const ProfilePage(), transition: Transition.noTransition);
+    } else if (userRole != null && userRole.toLowerCase() == 'admin') {
+      Get.offAll(() => const AdminDashboard(naame: "", lNaame: ""),
+          transition: Transition.noTransition);
+    } else {
+      Get.offAll(() => const MainDashboard(firstname: '', lastname: ''),
+          transition: Transition.noTransition);
     }
-
-    if (isLoggedIn && !isProfileCompleted) {
-      Get.offAll(
-        () => const ProfilePage(),
-        transition: Transition.fadeIn,
-        duration: const Duration(milliseconds: 500),
-      );
-      return;
-    }
-
-    if (isLoggedIn && isProfileCompleted) {
-      if (userRole != null && userRole.toLowerCase() == 'admin') {
-        Get.offAll(
-          () => const AdminDashboard(naame: "", lNaame: ""),
-          transition: Transition.fadeIn,
-          duration: const Duration(milliseconds: 500),
-        );
-      } else {
-        Get.offAll(
-          () => const MainDashboard(firstname: '', lastname: ''),
-          transition: Transition.fadeIn,
-          duration: const Duration(milliseconds: 500),
-        );
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AMColors.splashBackground,
+    return const Scaffold(
+      backgroundColor: Colors.white,
       body: Center(
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: SlideTransition(
-            position: _slideAnimation,
-            child: Text(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _OptimizedSplashImage(),
+            SizedBox(height: 5),
+            Text(
               "LA Digital Agency",
-              textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: "bold",
-                fontWeight: FontWeight.w700,
-                color: AMColors.splashText,
-                fontSize: 32,
-                letterSpacing: 1.4,
+                color: Color(0xFF121212),
+                fontSize: 15,
               ),
             ),
-          ),
+          ],
         ),
       ),
+    );
+  }
+}
+
+class _OptimizedSplashImage extends StatelessWidget {
+  const _OptimizedSplashImage();
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      "assets/icon/my_icon.png",
+      height: 120,
+      width: 120,
+      filterQuality: FilterQuality.high,
+      cacheWidth: 120,
+      cacheHeight: 120,
     );
   }
 }

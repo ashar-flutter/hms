@@ -48,8 +48,8 @@ class _InboxScreen extends State<InboxScreen> {
     final message = _messageController.text.trim();
     if (message.isEmpty || _chatRoomId == null) return;
 
-    await _chatController.sendMessage(_chatRoomId!, message);
     _messageController.clear();
+    await _chatController.sendMessage(_chatRoomId!, message);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
@@ -349,15 +349,17 @@ class _InboxScreen extends State<InboxScreen> {
 
                   final messages = snapshot.data!.docs;
 
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (_scrollController.hasClients && messages.isNotEmpty) {
+                  if (_scrollController.hasClients && messages.isNotEmpty) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
                       _scrollController.jumpTo(
                         _scrollController.position.maxScrollExtent,
                       );
-                    }
-                  });
+                    });
+                  }
 
                   return ListView.builder(
+                    addAutomaticKeepAlives: true,
+                    cacheExtent: 1000,
                     controller: _scrollController,
                     padding: const EdgeInsets.all(8),
                     itemCount: messages.length,

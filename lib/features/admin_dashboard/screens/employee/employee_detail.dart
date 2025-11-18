@@ -15,13 +15,15 @@ class EmployeeDetailScreen extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black,
+          size: 18,
+          ),
         ),
         centerTitle: true,
         title: const Text(
           "Employee Details",
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 15,
             fontFamily: "bold",
             color: Colors.black,
           ),
@@ -169,27 +171,6 @@ class EmployeeDetailScreen extends StatelessWidget {
           ], icon: Icons.business_center),
 
           const SizedBox(height: 20),
-
-          // Performance Metrics
-          _buildInfoCard("Performance Metrics", [
-            _buildMetricRow(
-              "Tasks Completed",
-              employee['performance']['tasksCompleted']?.toString() ?? '0',
-              Icons.task_alt,
-            ),
-            _buildMetricRow(
-              "On-time Attendance",
-              "${employee['performance']['onTimeAttendance']?.toString() ?? '0'} days",
-              Icons.access_time,
-            ),
-            _buildMetricRow(
-              "Leaves Taken",
-              employee['performance']['leavesTaken']?.toString() ?? '0',
-              Icons.beach_access,
-            ),
-          ], icon: Icons.analytics),
-
-          const SizedBox(height: 30),
         ],
       ),
     );
@@ -292,42 +273,6 @@ class EmployeeDetailScreen extends StatelessWidget {
                   ),
                 ),
               ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMetricRow(String label, String value, IconData icon) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: Colors.deepPurple, size: 20),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              label,
-              style: const TextStyle(
-                fontSize: 14,
-                fontFamily: "poppins",
-                color: Colors.black87,
-              ),
-            ),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 14,
-              fontFamily: "bold",
-              color: Colors.deepPurple,
             ),
           ),
         ],

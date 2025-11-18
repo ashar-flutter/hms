@@ -16,13 +16,13 @@ class EmployeeList extends StatelessWidget {
         child: AppBar(
           leading: IconButton(
             onPressed: () => Get.back(),
-            icon: const Icon(Icons.arrow_back, size: 20, color: Colors.black),
+            icon: const Icon(Icons.arrow_back, size: 18, color: Colors.black),
           ),
           centerTitle: true,
           title: const Text(
             "Tech Employees",
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 15,
               fontFamily: "bold",
               fontWeight: FontWeight.bold,
               color: Colors.black,

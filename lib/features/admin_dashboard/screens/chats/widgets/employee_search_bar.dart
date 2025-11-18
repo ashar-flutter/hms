@@ -16,9 +16,25 @@ class _EmployeeSearchBarState extends State<EmployeeSearchBar> {
   final _controller = ChatUserController();
   final _searchController = TextEditingController();
   final _auth = FirebaseAuth.instance;
+  final _focusNode = FocusNode();
   List<Map<String, dynamic>> _users = [];
   bool _isLoading = false;
   String _currentQuery = '';
+  bool _showResults = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(_handleFocusChange);
+  }
+
+  void _handleFocusChange() {
+    if (!_focusNode.hasFocus) {
+      setState(() {
+        _showResults = false;
+      });
+    }
+  }
 
   Future<void> _search(String query) async {
     if (query.isEmpty) {
@@ -26,6 +42,7 @@ class _EmployeeSearchBarState extends State<EmployeeSearchBar> {
         _users = [];
         _isLoading = false;
         _currentQuery = '';
+        _showResults = false;
       });
       return;
     }
@@ -35,6 +52,7 @@ class _EmployeeSearchBarState extends State<EmployeeSearchBar> {
     setState(() {
       _isLoading = true;
       _currentQuery = query;
+      _showResults = true;
     });
 
     try {
@@ -57,6 +75,12 @@ class _EmployeeSearchBarState extends State<EmployeeSearchBar> {
 
     if (selectedUserId == currentUserId) return;
 
+    _focusNode.unfocus();
+
+    setState(() {
+      _showResults = false;
+    });
+
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -67,6 +91,13 @@ class _EmployeeSearchBarState extends State<EmployeeSearchBar> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _focusNode.removeListener(_handleFocusChange);
+    _focusNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -86,10 +117,16 @@ class _EmployeeSearchBarState extends State<EmployeeSearchBar> {
             ],
           ),
           child: TextField(
+            focusNode: _focusNode,
             controller: _searchController,
             textInputAction: TextInputAction.done,
             onChanged: _search,
-            onEditingComplete: () => FocusScope.of(context).unfocus(),
+            onEditingComplete: () {
+              _focusNode.unfocus();
+              setState(() {
+                _showResults = false;
+              });
+            },
             style: const TextStyle(
               fontFamily: "poppins",
               fontSize: 16,
@@ -105,7 +142,7 @@ class _EmployeeSearchBarState extends State<EmployeeSearchBar> {
               ),
               filled: true,
               fillColor: Colors.white,
-              hintText: "Search employees....",
+              hintText: "Search user....",
               hintStyle: TextStyle(color: Colors.grey.shade900, fontSize: 15),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 20,
@@ -124,83 +161,85 @@ class _EmployeeSearchBarState extends State<EmployeeSearchBar> {
             ),
           ),
         ),
-        if (_isLoading)
+        if (_showResults && _isLoading)
           const Padding(
             padding: EdgeInsets.all(8),
             child: CircularProgressIndicator(),
           )
-        else if (_users.isEmpty && _searchController.text.isNotEmpty)
+        else if (_showResults &&
+            _users.isEmpty &&
+            _searchController.text.isNotEmpty)
           const Padding(
             padding: EdgeInsets.all(8),
             child: Text("No users found"),
           )
-        else if (_users.isNotEmpty)
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 22),
-            constraints: const BoxConstraints(maxHeight: 200),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: ListView.builder(
-              shrinkWrap: true,
-              physics: const ClampingScrollPhysics(),
-              itemCount: _users.length,
-              itemBuilder: (context, index) {
-                final user = _users[index];
-                final firstName = user['firstName']?.toString() ?? '';
-                final lastName = user['lastName']?.toString() ?? '';
-                final fullName = '$firstName $lastName'.trim();
-
-                final profileImage = user['profileImage'];
-                final avatar = profileImage != null
-                    ? MemoryImage(base64Decode(profileImage))
-                    : null;
-
-                return Container(
-                  margin: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
+        else if (_showResults && _users.isNotEmpty)
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 22),
+              constraints: const BoxConstraints(maxHeight: 200),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
                   ),
-                  child: ListTile(
-                    dense: true,
-                    leading: CircleAvatar(
-                      radius: 20,
-                      backgroundImage: avatar,
-                      backgroundColor: Colors.grey.shade300,
-                      child: avatar == null
-                          ? const Icon(
-                              Icons.person,
-                              color: Colors.white,
-                              size: 18,
-                            )
-                          : null,
+                ],
+              ),
+              child: ListView.builder(
+                shrinkWrap: true,
+                physics: const ClampingScrollPhysics(),
+                itemCount: _users.length,
+                itemBuilder: (context, index) {
+                  final user = _users[index];
+                  final firstName = user['firstName']?.toString() ?? '';
+                  final lastName = user['lastName']?.toString() ?? '';
+                  final fullName = '$firstName $lastName'.trim();
+
+                  final profileImage = user['profileImage'];
+                  final avatar = profileImage != null
+                      ? MemoryImage(base64Decode(profileImage))
+                      : null;
+
+                  return Container(
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
                     ),
-                    title: Text(
-                      fullName.isNotEmpty ? fullName : 'Unnamed User',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
+                    child: ListTile(
+                      dense: true,
+                      leading: CircleAvatar(
+                        radius: 20,
+                        backgroundImage: avatar,
+                        backgroundColor: Colors.grey.shade300,
+                        child: avatar == null
+                            ? const Icon(
+                          Icons.person,
+                          color: Colors.white,
+                          size: 18,
+                        )
+                            : null,
                       ),
+                      title: Text(
+                        fullName.isNotEmpty ? fullName : 'Unnamed User',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                      visualDensity: const VisualDensity(
+                        horizontal: 0,
+                        vertical: -4,
+                      ),
+                      onTap: () => _openInbox(user),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-                    visualDensity: const VisualDensity(
-                      horizontal: 0,
-                      vertical: -4,
-                    ),
-                    onTap: () => _openInbox(user),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
-          ),
       ],
     );
   }

@@ -22,21 +22,19 @@ class _ChatListWithBadgeState extends State<ChatListWithBadge> {
     final currentUserId = _auth.currentUser!.uid;
     return participants.firstWhere(
           (id) => id != currentUserId,
-          orElse: () => currentUserId,
-        )
-        as String;
+      orElse: () => currentUserId,
+    )
+    as String;
   }
 
   Future<void> _openChat(
-    Map<String, dynamic> chatData,
-    Map<String, dynamic> userData,
-  ) async {
+      Map<String, dynamic> chatData,
+      Map<String, dynamic> userData,
+      ) async {
     final currentUserId = _auth.currentUser!.uid;
     final chatRoomId = _getChatRoomId(currentUserId, userData['userId']);
 
-    // Mark messages as read when opening chat
-    await _unreadService.markMessagesAsRead(chatRoomId, currentUserId);
-
+    // Pehle navigation karo
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -47,6 +45,9 @@ class _ChatListWithBadgeState extends State<ChatListWithBadge> {
         ),
       ),
     );
+
+    // Phir background mein mark as read karo
+    _unreadService.markMessagesAsRead(chatRoomId, currentUserId);
   }
 
   String _getChatRoomId(String user1, String user2) {
@@ -67,7 +68,6 @@ class _ChatListWithBadgeState extends State<ChatListWithBadge> {
     }
   }
 
-  // Badge widget for unread count
   Widget _buildBadge(int count) {
     if (count == 0) return const SizedBox();
 

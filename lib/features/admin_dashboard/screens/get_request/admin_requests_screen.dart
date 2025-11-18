@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -438,7 +439,6 @@ class AdminRequestsScreen extends StatelessWidget {
     String? fileUrl,
   ) async {
     if (fileUrl != null && fileUrl.isNotEmpty) {
-      // Agar image hai toh preview dikhao aur browser option do
       if (fileUrl.toLowerCase().contains('.jpg') ||
           fileUrl.toLowerCase().contains('.jpeg') ||
           fileUrl.toLowerCase().contains('.png') ||
@@ -447,6 +447,7 @@ class AdminRequestsScreen extends StatelessWidget {
         Get.dialog(
           Dialog(
             child: Container(
+              margin: EdgeInsets.zero,
               width: 350,
               height: 500,
               child: Column(
@@ -513,7 +514,7 @@ class AdminRequestsScreen extends StatelessWidget {
                         Expanded(
                           child: ElevatedButton.icon(
                             onPressed: () {
-                              // Browser mein open karein
+                              Get.back();
                               _launchInBrowser(fileUrl);
                             },
                             icon: Icon(Icons.open_in_browser, size: 18),
@@ -528,7 +529,6 @@ class AdminRequestsScreen extends StatelessWidget {
                         Expanded(
                           child: ElevatedButton.icon(
                             onPressed: () {
-                              // Link copy karein
                               _copyToClipboard(fileUrl);
                             },
                             icon: Icon(Icons.copy, size: 18),
@@ -548,7 +548,6 @@ class AdminRequestsScreen extends StatelessWidget {
           ),
         );
       } else {
-        // Agar image nahi hai (PDF, Word, etc.) - PURANA SYSTEM BILKUL WAISA KA WAISA
         Get.dialog(
           AlertDialog(
             title: Text("File Uploaded to Cloud"),
@@ -569,7 +568,6 @@ class AdminRequestsScreen extends StatelessWidget {
         );
       }
     } else {
-      // Agar fileUrl nahi hai - PURANA SYSTEM BILKUL WAISA KA WAISA
       Get.dialog(
         AlertDialog(
           title: Text("File Info"),
@@ -593,11 +591,14 @@ class AdminRequestsScreen extends StatelessWidget {
   Future<void> _launchInBrowser(String url) async {
     try {
       final uri = Uri.parse(url);
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri);
-      }
+      await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
     } catch (e) {
-      //  - silent fail
+      if (kDebugMode) {
+        print('💥 Browser error: $e');
+      }
     }
   }
 

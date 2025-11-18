@@ -105,8 +105,7 @@ class AdminDetailScreen extends StatelessWidget {
           ]),
           const SizedBox(height: 16),
           _buildDetailCard("🕒 Office Hours", [
-            "• Monday - Friday: 9:00 AM - 6:00 PM",
-            "• Saturday: 10:00 AM - 2:00 PM",
+            "• Monday - Saturday: 4:00 PM - 10:00 PM",
             "• Sunday: Closed",
             "• Emergency: Available on call",
           ]),
@@ -122,8 +121,8 @@ class AdminDetailScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildDetailCard("📱 Contact Information", [
-            "• Office: +92 300 1234567",
-            "• WhatsApp: +92 300 1234567",
+            "• Office: +92 305 8490633",
+            "• WhatsApp: +92 305 8490633",
             "• Skype: ladigital.agency",
             "• Telegram: @ladigital",
           ]),

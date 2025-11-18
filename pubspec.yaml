@@ -51,13 +51,11 @@ dependencies:
   iconify_flutter: ^0.0.6
   permission_handler:
   cloud_firestore:
-  firebase_messaging:
-  flutter_local_notifications:
-  audioplayers: ^6.5.1
   flutter_svg:
   fl_chart: ^0.68.0
-  http:
+  http: ^1.6.0
   url_launcher: ^6.1.11
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -68,9 +66,14 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
-
+  flutter_launcher_icons: ^0.13.1
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
+flutter_icons:
+  android: true
+  image_path: "assets/icon/my_icon.png"
+
+
 
 # The following section is specific to Flutter packages.
 flutter:
@@ -101,6 +104,7 @@ flutter:
      - assets/dashboard/employee_card_3d.svg
      - assets/dashboard/active_employee_3d.svg
      - assets/dashboard/announcements_icon_3d.svg
+     - assets/icon/my_icon.png
 #     - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

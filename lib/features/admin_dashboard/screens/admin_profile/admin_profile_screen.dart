@@ -278,7 +278,7 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
                       _buildListTile(
                         icon: Icons.phone,
                         title: "Contact",
-                        subtitle: "+92 300 1234567",
+                        subtitle: "+92 305 8490633",
                       ),
                       _buildListTile(
                         icon: Icons.people,
