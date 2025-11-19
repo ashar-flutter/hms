@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert';
+import '../../../history/history_service.dart';
 import '../model/request_model.dart';
 
 class RequestStatusController extends GetxController {
@@ -20,14 +21,15 @@ class RequestStatusController extends GetxController {
   }
 
   void _loadRequestsFromFirebase() {
-    _firestore.collection(_collectionName)
+    _firestore
+        .collection(_collectionName)
         .orderBy('createdAt', descending: true)
         .snapshots()
         .listen((snapshot) {
-      requests.value = snapshot.docs.map((doc) {
-        return RequestModel.fromJson(doc.data());
-      }).toList();
-    });
+          requests.value = snapshot.docs.map((doc) {
+            return RequestModel.fromJson(doc.data());
+          }).toList();
+        });
   }
 
   String getCurrentUserId() {
@@ -86,6 +88,7 @@ class RequestStatusController extends GetxController {
         'fromDate': request.fromDate?.millisecondsSinceEpoch,
         'toDate': request.toDate?.millisecondsSinceEpoch,
         'status': request.status,
+        'leaveCount': request.leaveCount,
         'createdAt': DateTime.now().millisecondsSinceEpoch,
       };
 
@@ -104,7 +107,7 @@ class RequestStatusController extends GetxController {
           .collection(_collectionName)
           .doc(request.id)
           .set(firestoreData);
-
+      await HistoryService.syncRequestToHistory(simpleData);
     } catch (e) {
       if (e.toString().contains('exceeds the maximum allowed size')) {
         await _saveWithoutFileData(request);
@@ -143,9 +146,8 @@ class RequestStatusController extends GetxController {
           .collection(_collectionName)
           .doc(request.id)
           .set(requestData);
-
     } catch (e) {
-    //
+      //
     }
   }
 
@@ -169,6 +171,7 @@ class RequestStatusController extends GetxController {
         'status': 'approved',
         'updatedAt': FieldValue.serverTimestamp(),
       });
+      await HistoryService.updateHistoryStatus(requestId, 'approved');
 
       await _createNotification(
         userId: request.userId,
@@ -178,7 +181,7 @@ class RequestStatusController extends GetxController {
         requestId: requestId,
       );
     } catch (e) {
-    //
+      //
     }
   }
 
@@ -190,6 +193,7 @@ class RequestStatusController extends GetxController {
         'status': 'rejected',
         'updatedAt': FieldValue.serverTimestamp(),
       });
+      await HistoryService.updateHistoryStatus(requestId, 'rejected');
 
       await _createNotification(
         userId: request.userId,
@@ -199,7 +203,7 @@ class RequestStatusController extends GetxController {
         requestId: requestId,
       );
     } catch (e) {
-    //
+      //
     }
   }
 
@@ -229,7 +233,7 @@ class RequestStatusController extends GetxController {
           .doc(notificationId)
           .set(notificationData);
     } catch (e) {
-    //
+      //
     }
   }
 }

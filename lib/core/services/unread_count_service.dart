@@ -18,23 +18,20 @@ class UnreadCountService {
       for (final chatDoc in snapshot.docs) {
         final chatRoomId = chatDoc.id;
 
-        final lastMessageSnapshot = await _firestore
+        final messagesSnapshot = await _firestore
             .collection('chats')
             .doc(chatRoomId)
             .collection('messages')
-            .orderBy('timestamp', descending: true)
-            .limit(1)
+            .where('senderId', isNotEqualTo: currentUserId)
             .get();
 
-        if (lastMessageSnapshot.docs.isNotEmpty) {
-          final lastMessage = lastMessageSnapshot.docs.first.data();
-          final senderId = lastMessage['senderId'];
-          final readBy = List<String>.from(lastMessage['readBy'] ?? []);
+        final unreadMessages = messagesSnapshot.docs.where((messageDoc) {
+          final messageData = messageDoc.data();
+          final readBy = List<String>.from(messageData['readBy'] ?? []);
+          return !readBy.contains(currentUserId);
+        }).length;
 
-          if (senderId != currentUserId && !readBy.contains(currentUserId)) {
-            totalUnread += 1;
-          }
-        }
+        totalUnread += unreadMessages;
       }
 
       return totalUnread;
@@ -49,12 +46,9 @@ class UnreadCountService {
         .where('participants', arrayContains: currentUserId)
         .get();
 
-    final batch = _firestore.batch();
-
     for (final chatDoc in chatsSnapshot.docs) {
       final chatRoomId = chatDoc.id;
 
-      // Pehle sirf senderId filter karo
       final messagesSnapshot = await _firestore
           .collection('chats')
           .doc(chatRoomId)
@@ -62,11 +56,12 @@ class UnreadCountService {
           .where('senderId', isNotEqualTo: currentUserId)
           .get();
 
+      final batch = _firestore.batch();
+
       for (final messageDoc in messagesSnapshot.docs) {
         final messageData = messageDoc.data();
         final readBy = List<String>.from(messageData['readBy'] ?? []);
 
-        // Client side pe check karo agar read nahi hai
         if (!readBy.contains(currentUserId)) {
           final messageRef = _firestore
               .collection('chats')
@@ -78,10 +73,10 @@ class UnreadCountService {
           batch.update(messageRef, {'readBy': readBy});
         }
       }
-    }
 
-    if (chatsSnapshot.docs.isNotEmpty) {
-      await batch.commit();
+      if (messagesSnapshot.docs.isNotEmpty) {
+        await batch.commit();
+      }
     }
   }
 }

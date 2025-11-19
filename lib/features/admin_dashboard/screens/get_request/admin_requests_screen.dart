@@ -8,6 +8,7 @@ import 'package:hr_flow/features/dashboard/requests/model/request_model.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/snackbar/custom_snackbar.dart';
+import '../../../history/history_service.dart';
 import '../../services/file_open_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -323,6 +324,8 @@ class AdminRequestsScreen extends StatelessWidget {
                     child: ElevatedButton.icon(
                       onPressed: () {
                         controller.approveRequest(request.id);
+                        HistoryService.updateHistoryStatus(request.id, 'approved');
+
                         CustomSnackBar.show(
                           title: "Approved",
                           message: "Request has been approved",
@@ -355,6 +358,8 @@ class AdminRequestsScreen extends StatelessWidget {
                     child: ElevatedButton.icon(
                       onPressed: () {
                         controller.rejectRequest(request.id);
+                        HistoryService.updateHistoryStatus(request.id, 'rejected');
+
                         _returnLeaveBalance(
                           request.id,
                           request.leaveCount,

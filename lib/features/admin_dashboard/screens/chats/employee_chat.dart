@@ -13,11 +13,22 @@ class EmployeeChat extends StatefulWidget {
 
 class _EmployeeChatState extends State<EmployeeChat> {
   final UnreadCountService _unreadCountService = UnreadCountService();
+  bool _hasMarkedRead = false;
 
   @override
   void initState() {
     super.initState();
-    _unreadCountService.markAllChatsAsRead();
+    _markMessagesAsRead();
+  }
+
+  Future<void> _markMessagesAsRead() async {
+    if (!_hasMarkedRead) {
+      _hasMarkedRead = true;
+      await _unreadCountService.markAllChatsAsRead();
+
+      await Future.delayed(Duration(milliseconds: 500));
+      await _unreadCountService.markAllChatsAsRead();
+    }
   }
 
   @override

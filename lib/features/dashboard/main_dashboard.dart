@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hr_flow/features/chats/screens/main_chat_screen.dart';
 import 'package:hr_flow/features/dashboard/screens/home_dashboard.dart';
 import 'package:hr_flow/core/services/credential_store_service.dart';
+import 'package:hr_flow/features/history/main_history_page.dart';
 import 'package:hr_flow/features/user/user_information/user_information.dart';
 import 'package:iconsax/iconsax.dart';
 import '../../core/services/unread_count_service.dart';
@@ -39,7 +40,7 @@ class _MainDashboardState extends State<MainDashboard> {
 
     _screens = [
       HomeDashboard(fName: '', lName: ''),
-      const Center(child: Text("History Screen")),
+      HistoryScreen(),
       MainChatScreen(),
       UserInformation(),
     ];
@@ -175,7 +176,12 @@ class _MainDashboardState extends State<MainDashboard> {
     final String label = item['label'];
 
     return GestureDetector(
-      onTap: () => _onNavItemTapped(index),
+      onTap: () async {
+        if (index == 2) {
+          await _unreadCountService.markAllChatsAsRead();
+        }
+        _onNavItemTapped(index);
+      },
       behavior: HitTestBehavior.opaque,
       child: Container(
         width: 60,

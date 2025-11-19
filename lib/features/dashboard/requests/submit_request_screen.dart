@@ -8,7 +8,7 @@ import 'package:hr_flow/features/dashboard/requests/request_submitted_dialog.dar
 import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../core/snackbar/custom_snackbar.dart';
-import '../../admin_dashboard/services/lib/services/imgbb_service.dart';
+import 'package:hr_flow/features/admin_dashboard/services/lib/services/imgbb_service.dart';
 import '../main_dashboard.dart';
 import '../screens/leave_balance/service/leave_balance_service.dart';
 import '../screens/leave_balance/validator/leave_validator.dart';
@@ -68,7 +68,6 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
   }
 
   void _submitRequest(File? file) async {
-
     int leaveCount = _calculateLeaveCount();
     bool canProceed = await LeaveValidator.validateLeaveRequest(leaveCount);
     if (!canProceed) return;
@@ -99,7 +98,6 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
       } catch (e) {
         print('🔴 ImgBB Exception: $e');
       }
-
 
       final compressedBytes = await _compressFileIfNeeded(file);
       fileData = base64Encode(compressedBytes);
@@ -133,7 +131,6 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
     statusController.addRequest(newRequest);
     await LeaveBalanceService.updateLeaveBalance(leaveCount);
 
-
     if (!mounted) return;
     showDialog(
       context: context,
@@ -149,7 +146,10 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
         fileName: fileName ?? 'No file attached',
       ),
     ).then((_) {
-      Get.offAll(() => MainDashboard(firstname: '', lastname: ''));
+      FocusScope.of(context).unfocus();
+      Future.delayed(Duration.zero, () {
+        Get.offAll(() => MainDashboard(firstname: '', lastname: ''));
+      });
     });
 
     if (!mounted) return;
@@ -163,6 +163,7 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
       icon: Iconsax.message_tick,
     );
   }
+
   int _calculateLeaveCount() {
     if (fromDate == null) return 1;
     if (toDate == null) return 1;

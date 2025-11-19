@@ -162,6 +162,7 @@ class RequestSubmittedDialog extends StatelessWidget {
       height: 55,
       child: ElevatedButton(
         onPressed: () {
+          FocusScope.of(context).unfocus();
           Navigator.of(context).pop();
         },
         style: ElevatedButton.styleFrom(
