@@ -8,6 +8,8 @@ import 'package:hr_flow/features/dashboard/screens/custom_card.dart';
 import 'package:get/get.dart';
 import 'package:hr_flow/features/dashboard/screens/leave_balance/pages/balance_card.dart';
 import 'package:hr_flow/features/dashboard/screens/request_notification_screen.dart';
+import '../../Announce/announce_list_screen.dart';
+import '../../Announce/employee_announce_controller.dart';
 import '../documents/service/user_document_status_service.dart';
 import '../requests/controller/notification_controller.dart';
 
@@ -35,6 +37,7 @@ class HomeDashboard extends StatelessWidget {
   void _navigateToReports() => _safeNavigation(() => Reports());
   void _navigateToNotifications() =>
       _safeNavigation(() => NotificationsScreen());
+  void _navigateToAnnouncements() => Get.to(() => AnnounceListScreen());
 
   void _safeNavigation(Widget Function() screenBuilder) {
     Future.microtask(() {
@@ -268,6 +271,8 @@ class HomeDashboard extends StatelessWidget {
   }
 
   Widget _buildSecondRowCards() {
+    final announceController = Get.find<EmployeeAnnounceController>();
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -276,10 +281,45 @@ class HomeDashboard extends StatelessWidget {
           text: "Reports",
           imagePath: "assets/dashboard/futuristic_reports_icon.svg",
         ),
-        const CustomCard(
-          text: "Announce..",
-          imagePath: "assets/dashboard/announcements_icon_3d.svg",
-        ),
+
+        // Announce Card with Badge
+        Obx(() => Stack(
+          clipBehavior: Clip.none,
+          children: [
+            CustomCard(
+              onTap: _navigateToAnnouncements,
+              text: "Announce..",
+              imagePath: "assets/dashboard/announcements_icon_3d.svg",
+            ),
+
+            // Badge on CustomCard
+            if (announceController.unreadCount.value > 0)
+              Positioned(
+                top: 5,
+                right: 5,
+                child: Container(
+                  padding: EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2),
+                  ),
+                  constraints: BoxConstraints(minWidth: 20, minHeight: 20),
+                  child: Text(
+                    announceController.unreadCount.value > 9 ?
+                    '9+' : announceController.unreadCount.value.toString(),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 9,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+          ],
+        )),
+
         const SizedBox(height: 100, width: 100),
       ],
     );

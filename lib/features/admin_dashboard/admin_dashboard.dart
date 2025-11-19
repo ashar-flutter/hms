@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hr_flow/features/admin_dashboard/screens/admin_profile/admin_profile_screen.dart';
 import 'package:hr_flow/features/admin_dashboard/screens/chats/employee_chat.dart';
 import 'package:hr_flow/features/admin_dashboard/screens/main_admin_dashboard.dart';
+import 'package:hr_flow/features/admin_dashboard/screens/reports/reports_list_screen.dart';
 import 'all_components/admin_bottom_bar.dart';
 
 class AdminDashboard extends StatefulWidget {
@@ -25,7 +26,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     _screens = [
       MainAdminDashboard(name: widget.naame, lName: widget.lNaame),
       const EmployeeChat(),
-      const Center(child: Text("Reports Section")),
+      ReportsListScreen(),
       const AdminProfileScreen(),
     ];
   }

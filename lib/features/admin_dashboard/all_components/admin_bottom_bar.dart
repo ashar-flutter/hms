@@ -76,6 +76,7 @@ class AdminBottomBar extends StatelessWidget {
 
     return GestureDetector(
       onTap: () => onItemSelected(index),
+
       behavior: HitTestBehavior.opaque,
       child: Container(
         width: 60,
@@ -115,7 +116,6 @@ class AdminBottomBar extends StatelessWidget {
 
     return GestureDetector(
       onTap: () async {
-        // ✅ YEH LINE ADD KARO - Message icon click pe mark as read
         if (index == 1) {
           await unreadCountService.markAllChatsAsRead();
         }
