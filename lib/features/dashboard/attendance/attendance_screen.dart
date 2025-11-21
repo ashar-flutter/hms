@@ -318,21 +318,6 @@ class _AttendanceScreenState extends State<AttendanceScreen>
     final screenHeight = MediaQuery.of(context).size.height;
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.arrow_back, color: Colors.black, size: 18),
-          ),
-          centerTitle: true,
-          title: Text(
-            "Attendance",
-            style: TextStyle(
-              fontFamily: "bold",
-              color: Colors.black,
-              fontSize: 14,
-            ),
-          ),
-        ),
         backgroundColor: Colors.grey.shade300,
         body: Stack(
           children: [

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import '../main_dashboard.dart';
 
-class RequestSubmittedDialog extends StatelessWidget {
+class RequestSubmittedDialog extends StatefulWidget {
   final String category;
   final String type;
   final String reason;
@@ -22,25 +24,84 @@ class RequestSubmittedDialog extends StatelessWidget {
   });
 
   @override
+  State<RequestSubmittedDialog> createState() => _RequestSubmittedDialogState();
+}
+
+class _RequestSubmittedDialogState extends State<RequestSubmittedDialog>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _opacityAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+
+    _scaleAnimation = Tween<double>(
+      begin: 0.8,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.elasticOut));
+
+    _opacityAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+
+    _controller.forward();
+
+    _startAutoNavigate();
+  }
+
+  void _startAutoNavigate() {
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        Navigator.of(context).pop();
+        Get.offAll(() => MainDashboard(firstname: '', lastname: ''));
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.all(20),
-      child: _buildDialogContent(context),
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _scaleAnimation.value,
+            child: Opacity(
+              opacity: _opacityAnimation.value,
+              child: _buildDialogContent(),
+            ),
+          );
+        },
+      ),
     );
   }
 
-  Widget _buildDialogContent(BuildContext context) {
+  Widget _buildDialogContent() {
     return Container(
       padding: const EdgeInsets.all(30),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.15),
-            blurRadius: 25,
-            spreadRadius: 2,
+            blurRadius: 30,
+            spreadRadius: 0,
             offset: const Offset(0, 10),
           ),
         ],
@@ -49,41 +110,47 @@ class RequestSubmittedDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(),
+          _buildSuccessHeader(),
           const SizedBox(height: 25),
-
-          _buildDataContainer(),
-          const SizedBox(height: 25),
-
-          _buildDoneButton(context),
+          _buildRequestInfo(),
+          const SizedBox(height: 20),
+          _buildAutoNavigateText(),
         ],
       ),
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildSuccessHeader() {
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: Colors.green.withValues(alpha: 0.1),
+            gradient: const LinearGradient(
+              colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
             shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF667EEA).withValues(alpha: 0.4),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
           ),
-          child: const Icon(
-            Icons.check_circle_rounded,
-            color: Colors.green,
-            size: 25,
-          ),
+          child: const Icon(Icons.check_rounded, color: Colors.white, size: 28),
         ),
         const SizedBox(width: 15),
         const Expanded(
           child: Text(
-            "Request Submitted Successfully!",
+            "Request Submitted!",
             style: TextStyle(
               fontFamily: "bold",
-              fontSize: 14,
+              fontSize: 18,
               color: Colors.black87,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ),
@@ -91,110 +158,145 @@ class RequestSubmittedDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildDataContainer() {
+  Widget _buildRequestInfo() {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.grey.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.grey.withValues(alpha: 0.2), width: 1),
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
       ),
       child: Column(
         children: [
-          _buildDataRow("Category", category),
-          const SizedBox(height: 12),
-          _buildDataRow("Type", type),
-          const SizedBox(height: 12),
-          _buildDataRow("Reason", reason),
-          const SizedBox(height: 12),
-          _buildDataRow("From Date", _formatDate(fromDate)),
-          const SizedBox(height: 12),
-          _buildDataRow("To Date", _formatDate(toDate)),
-          const SizedBox(height: 12),
-          _buildDataRow("Description", description),
-          const SizedBox(height: 12),
-          _buildDataRow("Attached File", fileName),
+          _buildInfoItem(
+            "Category",
+            widget.category,
+            Icons.category_outlined,
+          ),
+          const SizedBox(height: 16),
+          _buildInfoItem(
+            "Type",
+            widget.type,
+            Icons.format_list_bulleted_outlined,
+          ),
+          const SizedBox(height: 16),
+          _buildInfoItem(
+            "Reason",
+            widget.reason,
+            Icons.help_outline_outlined,
+          ),
+          const SizedBox(height: 16),
+          _buildInfoItem(
+            "From Date",
+            _formatDate(widget.fromDate),
+            Icons.calendar_today_outlined,
+          ),
+          const SizedBox(height: 16),
+          _buildInfoItem(
+            "To Date",
+            _formatDate(widget.toDate),
+            Icons.calendar_today_outlined,
+          ),
+          const SizedBox(height: 16),
+          _buildInfoItem(
+            "Description",
+            widget.description.isEmpty ? "No description" : widget.description,
+            Icons.description_outlined,
+          ),
+          const SizedBox(height: 16),
+          _buildInfoItem(
+            "Attached File",
+            widget.fileName,
+            Icons.attach_file_rounded,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildDataRow(String label, String value) {
+  Widget _buildInfoItem(String label, String value, IconData icon) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          width: 100,
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontFamily: "bold",
-              color: Colors.black54,
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
+        Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: const Color(0xFF667EEA).withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
           ),
+          child: Icon(icon, size: 16, color: const Color(0xFF667EEA)),
         ),
-        const Text(":", style: TextStyle(color: Colors.black54, fontSize: 14)),
-        const SizedBox(width: 10),
+        const SizedBox(width: 12),
         Expanded(
-          child: Text(
-            value,
-            style: const TextStyle(
-              color: Colors.black87,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(
+                  fontFamily: "bold",
+                  fontSize: 12,
+                  color: Color(0xFF64748B),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontFamily: "poppins",
+                  fontSize: 14,
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w500,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildAutoNavigateText() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF0F9FF),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFBAE6FD), width: 1),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 18,
+            height: 18,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                const Color(0xFF667EEA),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          const Text(
+            "Redirecting to dashboard...",
+            style: TextStyle(
+              fontFamily: "poppins",
+              fontSize: 13,
+              color: Color(0xFF0369A1),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   String _formatDate(DateTime? date) {
     if (date == null) return "Not selected";
     return DateFormat('dd/MM/yyyy').format(date);
-  }
-
-  Widget _buildDoneButton(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 55,
-      child: ElevatedButton(
-        onPressed: () {
-          FocusScope.of(context).unfocus();
-          Navigator.of(context).pop();
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          foregroundColor: Colors.white,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          padding: EdgeInsets.zero,
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: const Center(
-            child: Text(
-              "DONE",
-              style: TextStyle(
-                fontFamily: "bold",
-                color: Colors.white,
-                fontSize: 15,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }

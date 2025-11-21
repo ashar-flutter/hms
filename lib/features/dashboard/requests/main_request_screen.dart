@@ -218,10 +218,12 @@ class _MainRequestScreenState extends State<MainRequestScreen> {
             height: 55,
             child: DecoratedBox(
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFF6A11CB), Color(0xFF2575FC)],
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
                 ),
-                borderRadius: BorderRadius.circular(28),
+                borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black26,
@@ -235,7 +237,7 @@ class _MainRequestScreenState extends State<MainRequestScreen> {
                   backgroundColor: Colors.transparent,
                   shadowColor: Colors.transparent,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(28),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                 ),
                 onPressed: _handleAddRequest,

@@ -23,15 +23,8 @@ class MainDocumentPage extends StatelessWidget {
         preferredSize: const Size.fromHeight(85),
         child: Container(
           decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xFFFFFFFF), // white
-                Color(0xFFF2F6FA), // soft blue-gray
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
             borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
+            color: Colors.white,
             boxShadow: [
               BoxShadow(
                 color: Colors.black12,

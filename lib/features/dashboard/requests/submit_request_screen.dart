@@ -39,7 +39,7 @@ class SubmitRequestScreen extends StatefulWidget {
 class _SubmitRequestScreenState extends State<SubmitRequestScreen>
     with SingleTickerProviderStateMixin {
   final RequestStatusController statusController =
-      Get.find<RequestStatusController>();
+  Get.find<RequestStatusController>();
   late UploadController uploadController;
 
   String selectedOption = "";
@@ -192,93 +192,127 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
     return originalBytes.sublist(0, 300000);
   }
 
+  Widget _buildSectionHeader(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        fontFamily: "bold",
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        color: Colors.black87,
+      ),
+    );
+  }
+
+  Widget _buildInputField({
+    required String label,
+    required String hint,
+    required IconData icon,
+    required Widget child,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, size: 18, color: Colors.grey[600]),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: "bold",
+                fontSize: 14,
+                color: Colors.grey[700],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        child,
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(70),
-        child: AppBar(
-          leading: IconButton(
-            onPressed: () => Get.back(),
-            icon: const Icon(size: 18, Icons.arrow_back),
-          ),
-          centerTitle: true,
-          title: const Text(
-            "Submit leave",
-            style: TextStyle(
-              fontSize: 15,
-              fontFamily: "bold",
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-          backgroundColor: Colors.white,
-          elevation: 0,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(bottom: Radius.circular(40)),
-          ),
-          flexibleSpace: Container(
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(85),
+          child: Container(
             decoration: const BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(40)),
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black26,
-                  blurRadius: 20,
-                  offset: Offset(0, 10),
+                  color: Colors.black12,
+                  blurRadius: 15,
+                  offset: Offset(0, 5),
                 ),
               ],
             ),
-          ),
-        ),
-      ),
-      body: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(height: AppBar().preferredSize.height / 2),
-              Padding(
-                padding: const EdgeInsets.only(left: 15),
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Text(
-                    "Select days for leave",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontFamily: "bold",
-                      color: Colors.black,
-                    ),
-                  ),
+            child: AppBar(
+              leading: IconButton(
+                onPressed: () => Get.back(),
+                icon: const Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  size: 18,
+                  color: Colors.black,
                 ),
               ),
+              centerTitle: true,
+              title: const Text(
+                "Submit Leave Request",
+                style: TextStyle(
+                  fontFamily: "bold",
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black,
+                ),
+              ),
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(
+                  bottom: Radius.circular(30),
+                ),
+              ),
+            ),
+          ),
+        ),
+        body: SingleChildScrollView(
+          physics: const ClampingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildSectionHeader("Leave Duration"),
               const SizedBox(height: 20),
+
               Row(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20),
-                    child: GestureDetector(
-                      onTap: () => selectOption("one"),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 150),
-                        height: 18,
-                        width: 18,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.black, width: 2),
-                        ),
-                        child: Center(
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 150),
-                            height: selectedOption == "one" ? 10 : 0,
-                            width: selectedOption == "one" ? 10 : 0,
-                            decoration: BoxDecoration(
-                              color: selectedOption == "one"
-                                  ? Colors.blue.shade900
-                                  : Colors.transparent,
-                              shape: BoxShape.circle,
-                            ),
+                  GestureDetector(
+                    onTap: () => selectOption("one"),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 150),
+                      height: 18,
+                      width: 18,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.black, width: 2),
+                      ),
+                      child: Center(
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 150),
+                          height: selectedOption == "one" ? 10 : 0,
+                          width: selectedOption == "one" ? 10 : 0,
+                          decoration: BoxDecoration(
+                            color: selectedOption == "one"
+                                ? Colors.blue.shade900
+                                : Colors.transparent,
+                            shape: BoxShape.circle,
                           ),
                         ),
                       ),
@@ -288,12 +322,12 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                   const Text(
                     "For one day",
                     style: TextStyle(
-                      fontSize: 15,
+                      fontSize: 14,
                       fontFamily: "bold",
                       color: Colors.black,
                     ),
                   ),
-                  const SizedBox(width: 15),
+                  const SizedBox(width: 30),
                   GestureDetector(
                     onTap: () => selectOption("multiple"),
                     child: AnimatedContainer(
@@ -319,74 +353,53 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                       ),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 15),
                   const Text(
-                    "For multiple day's",
+                    "For multiple days",
                     style: TextStyle(
                       fontFamily: "bold",
                       color: Colors.black,
-                      fontSize: 15,
+                      fontSize: 14,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 30),
-              Padding(
-                padding: const EdgeInsets.only(left: 15),
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Text(
-                    "From Date",
-                    style: TextStyle(fontFamily: "bold", color: Colors.black),
+              const SizedBox(height: 25),
+
+              _buildInputField(
+                label: "From Date",
+                hint: "Select from date",
+                icon: Icons.calendar_today_outlined,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey.shade300, width: 1.5),
                   ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              Container(
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 22,
-                  vertical: 10,
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30),
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                  border: Border.all(color: Colors.grey.shade300, width: 2),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 5),
-                      child: Text(
-                        formatDate(fromDate),
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: fromDate == null
-                              ? Colors.grey.shade500
-                              : Colors.black,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        child: Text(
+                          formatDate(fromDate),
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: fromDate == null
+                                ? Colors.grey.shade500
+                                : Colors.black,
+                            fontFamily: "poppins",
+                          ),
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 5),
-                      child: IconButton(
+                      IconButton(
                         onPressed: () async {
-                          final picked = await DatePickerHelper.pickFromDate(
-                            context,
-                          );
+                          final picked = await DatePickerHelper.pickFromDate(context);
                           if (picked != null) {
                             setState(() {
                               fromDate = picked;
-                              if (toDate != null &&
-                                  toDate!.isBefore(fromDate!)) {
+                              if (toDate != null && toDate!.isBefore(fromDate!)) {
                                 toDate = null;
                               }
                             });
@@ -394,118 +407,87 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                         },
                         icon: Icon(
                           Icons.calendar_month,
-                          color: Colors.deepPurple.shade900,
+                          color: Colors.deepPurple.shade700,
+                          size: 20,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 15),
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Text(
-                    "To Date",
-                    style: TextStyle(fontFamily: "bold", color: Colors.black),
+                    ],
                   ),
                 ),
               ),
-              const SizedBox(height: 10),
-              Container(
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 22,
-                  vertical: 10,
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30),
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                  border: Border.all(color: Colors.grey.shade300, width: 2),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 5),
-                      child: Text(
-                        formatDate(toDate),
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: toDate == null
-                              ? Colors.grey.shade500
-                              : Colors.black,
+              const SizedBox(height: 20),
+
+              _buildInputField(
+                label: "To Date",
+                hint: "Select to date",
+                icon: Icons.calendar_today_outlined,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey.shade300, width: 1.5),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        child: Text(
+                          formatDate(toDate),
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: toDate == null
+                                ? Colors.grey.shade500
+                                : Colors.black,
+                            fontFamily: "poppins",
+                          ),
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 5),
-                      child: IconButton(
+                      IconButton(
                         onPressed: () async {
-                          final picked = await DatePickerHelper.pickToDate(
-                            context,
-                            fromDate,
-                          );
+                          final picked = await DatePickerHelper.pickToDate(context, fromDate);
                           if (picked != null) setState(() => toDate = picked);
                         },
                         icon: Icon(
                           Icons.calendar_month,
-                          color: Colors.deepPurple.shade900,
+                          color: Colors.deepPurple.shade700,
+                          size: 20,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 15),
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Text(
-                    "Description",
-                    style: TextStyle(fontFamily: "bold", color: Colors.black),
+                    ],
                   ),
                 ),
               ),
-              const SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 22,
-                  vertical: 10,
-                ),
+              const SizedBox(height: 25),
+
+              _buildSectionHeader("Additional Information"),
+              const SizedBox(height: 20),
+
+              _buildInputField(
+                label: "Description",
+                hint: "Write your description here...",
+                icon: Icons.description_outlined,
                 child: Container(
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(25),
+                    borderRadius: BorderRadius.circular(12),
                     color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                    border: Border.all(color: Colors.grey.shade300, width: 2),
+                    border: Border.all(color: Colors.grey.shade300, width: 1.5),
                   ),
                   child: TextFormField(
                     controller: _descController,
                     maxLines: 5,
-                    cursorColor: Colors.deepPurple.shade900,
+                    cursorColor: Colors.deepPurple.shade700,
+                    style: const TextStyle(fontFamily: "poppins", fontSize: 14),
                     decoration: InputDecoration(
                       hintText: "Write your description here...",
                       hintStyle: TextStyle(
-                        fontSize: 15,
+                        fontSize: 14,
                         fontFamily: "poppins",
                         color: Colors.grey.shade500,
                       ),
                       contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 20,
+                        horizontal: 16,
                         vertical: 15,
                       ),
                       border: InputBorder.none,
@@ -513,17 +495,11 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 15),
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Text(
-                    "Attachments",
-                    style: TextStyle(fontFamily: "bold", color: Colors.black),
-                  ),
-                ),
-              ),
+              const SizedBox(height: 25),
+
+              _buildSectionHeader("Attachment"),
               const SizedBox(height: 15),
+
               Obx(() {
                 final file = uploadController.selectedFile.value;
                 return GestureDetector(
@@ -534,55 +510,74 @@ class _SubmitRequestScreenState extends State<SubmitRequestScreen>
                   ),
                 );
               }),
-              const SizedBox(height: 200),
+              const SizedBox(height: 40),
             ],
           ),
         ),
-      ),
-      bottomSheet: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.5),
-              blurRadius: 40,
-              spreadRadius: 6,
-              offset: const Offset(0, 12),
-            ),
-          ],
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
-          color: Colors.white,
-        ),
-        child: SizedBox(
-          width: double.infinity,
-          height: 55,
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF6A11CB),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(28),
+        bottomSheet: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 25,
+                spreadRadius: 0,
+                offset: const Offset(0, 8),
               ),
-            ),
-            onPressed: () {
-              final file = uploadController.selectedFile.value;
-              final isValid = ValidationHelper.validateForm(
-                selectedOption: selectedOption,
-                fromDate: fromDate,
-                toDate: toDate,
-                description: _descController.text.trim(),
-                file: file,
-              );
+            ],
+          ),
+          child: SizedBox(
+            width: double.infinity,
+            height: 58,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF667EEA).withOpacity(0.4),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                onPressed: () {
+                  final file = uploadController.selectedFile.value;
+                  final isValid = ValidationHelper.validateForm(
+                    selectedOption: selectedOption,
+                    fromDate: fromDate,
+                    toDate: toDate,
+                    description: _descController.text.trim(),
+                    file: file,
+                  );
 
-              if (!isValid) return;
+                  if (!isValid) return;
 
-              _submitRequest(file);
-            },
-            child: const Text(
-              "Submit Request",
-              style: TextStyle(
-                fontFamily: "bold",
-                color: Colors.white,
-                fontSize: 15,
+                  _submitRequest(file);
+                },
+                child: const Text(
+                  "Submit Request",
+                  style: TextStyle(
+                    fontFamily: "bold",
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ),
           ),

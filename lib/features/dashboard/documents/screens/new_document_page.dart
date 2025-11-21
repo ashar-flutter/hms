@@ -5,7 +5,9 @@ import 'package:hr_flow/features/dashboard/documents/widgets/date_field.dart';
 import 'package:hr_flow/features/dashboard/documents/widgets/doc_attach_box.dart';
 import 'package:hr_flow/features/dashboard/documents/widgets/doc_field.dart';
 import 'package:hr_flow/features/dashboard/documents/widgets/doc_type_field.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../../core/snackbar/custom_snackbar.dart';
 import '../service/document_service.dart';
 
 class NewDocumentPage extends StatefulWidget {
@@ -59,19 +61,51 @@ class _NewDocumentPageState extends State<NewDocumentPage> {
     FocusScope.of(context).unfocus();
 
     if (docNameController.text.trim().isEmpty) {
-      _showErrorSnackbar('Please enter document name');
+      CustomSnackBar.show(
+        title: "Error",
+        message: "Please enter document name",
+        backgroundColor: Colors.redAccent.shade400,
+        textColor: Colors.black,
+        shadowColor: Colors.transparent,
+        borderColor: Colors.transparent,
+        icon: Iconsax.close_square,
+      );
       return;
     }
     if (selectedType == null || selectedType!.isEmpty) {
-      _showErrorSnackbar('Please select document type');
+      CustomSnackBar.show(
+        title: "Error",
+        message: "Please select document type",
+        backgroundColor: Colors.redAccent.shade400,
+        textColor: Colors.black,
+        shadowColor: Colors.transparent,
+        borderColor: Colors.transparent,
+        icon: Iconsax.close_square,
+      );
       return;
     }
     if (dateController.text.trim().isEmpty) {
-      _showErrorSnackbar('Please select submission date');
+      CustomSnackBar.show(
+        title: "Error",
+        message: "Please select submission date",
+        backgroundColor: Colors.redAccent.shade400,
+        textColor: Colors.black,
+        shadowColor: Colors.transparent,
+        borderColor: Colors.transparent,
+        icon: Iconsax.close_square,
+      );
       return;
     }
     if (attachedFile == null) {
-      _showErrorSnackbar('Please attach a file');
+      CustomSnackBar.show(
+        title: "Error",
+        message: "Please attach a file",
+        backgroundColor: Colors.redAccent.shade400,
+        textColor: Colors.black,
+        shadowColor: Colors.transparent,
+        borderColor: Colors.transparent,
+        icon: Iconsax.close_square,
+      );
       return;
     }
 
@@ -150,14 +184,7 @@ class _NewDocumentPageState extends State<NewDocumentPage> {
           preferredSize: const Size.fromHeight(85),
           child: Container(
             decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFFFFFFFF), // white
-                  Color(0xFFF2F6FA), // soft blue-gray
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
+              color: Colors.white,
               borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
               boxShadow: [
                 BoxShadow(
