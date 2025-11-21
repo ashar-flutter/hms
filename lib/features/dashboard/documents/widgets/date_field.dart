@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 
 class DateField extends StatelessWidget {
   final TextEditingController controller;
-  const DateField({super.key, required this.controller});
+  final FocusNode? focusNode;
+
+  const DateField({super.key, required this.controller,this.focusNode});
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -31,6 +33,7 @@ class DateField extends StatelessWidget {
         ],
       ),
       child: TextField(
+        focusNode: focusNode,
         controller: controller,
         readOnly: true,
         style: const TextStyle(

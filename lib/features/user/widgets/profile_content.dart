@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hr_flow/features/user/widgets/profile_cache_service.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'dart:io';
@@ -25,6 +26,16 @@ class _ProfileContentState extends State<ProfileContent> {
 
   Future<void> _loadUserData() async {
     try {
+      // First try to load from cache
+      final cachedData = await ProfileCacheService().getCachedProfileData();
+      if (cachedData != null && cachedData.isNotEmpty) {
+        setState(() {
+          userData = cachedData;
+          isLoading = false;
+        });
+      }
+
+      // Then load from Firestore (whether cache exists or not)
       final userId = FirebaseAuth.instance.currentUser!.uid;
       final doc = await FirebaseFirestore.instance
           .collection('users')
@@ -32,8 +43,13 @@ class _ProfileContentState extends State<ProfileContent> {
           .get();
 
       if (doc.exists) {
+        final freshData = doc.data()!;
+
+        // Cache the fresh data
+        await ProfileCacheService().cacheProfileData(freshData);
+
         setState(() {
-          userData = doc.data();
+          userData = freshData;
         });
       }
     } catch (e) {
@@ -72,6 +88,11 @@ class _ProfileContentState extends State<ProfileContent> {
         'profileImage': base64Image,
         'updatedAt': FieldValue.serverTimestamp(),
       });
+
+      // Update cached data
+      final updatedData = Map<String, dynamic>.from(userData!);
+      updatedData['profileImage'] = base64Image;
+      await ProfileCacheService().cacheProfileData(updatedData);
 
       setState(() {
         userData!['profileImage'] = base64Image;
@@ -186,7 +207,7 @@ class _ProfileContentState extends State<ProfileContent> {
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 25,
-            spreadRadius: 2,
+            spreadRadius: 0,
             offset: const Offset(0, 8),
           ),
         ],
@@ -304,7 +325,7 @@ class _ProfileContentState extends State<ProfileContent> {
                     ],
                   ),
                   child: const Icon(
-                    Icons.camera_alt,
+                    Icons.edit,
                     color: Colors.white,
                     size: 20,
                   ),

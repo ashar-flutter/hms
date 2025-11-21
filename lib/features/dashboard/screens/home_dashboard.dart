@@ -27,7 +27,6 @@ class HomeDashboard extends StatelessWidget {
   );
 
   static const double _appBarHeight = 70;
-  static const double _sectionSpacing1 = _appBarHeight / 2; // 35
   static const double _sectionSpacing2 = _appBarHeight / 3; // ~23.33
   static const double _sectionSpacing3 = _appBarHeight / 2; // 35
 
@@ -56,17 +55,18 @@ class HomeDashboard extends StatelessWidget {
         preferredSize: const Size.fromHeight(_appBarHeight),
         child: _buildOptimizedAppBar(),
       ),
-      body: SafeArea(
+      body: Container(
+        color: Colors.white,
         child: SingleChildScrollView(
           child: Column(
             children: [
-              const SizedBox(height: _sectionSpacing1),
+              SizedBox(height: 15,),
               const AttendanceCard(),
               const SizedBox(height: _sectionSpacing2),
               const BalanceCard(),
               const SizedBox(height: _sectionSpacing3),
               _buildSectionTitle(),
-              const SizedBox(height: _sectionSpacing3),
+              const SizedBox(height: _sectionSpacing2),
               _buildFirstRowCards(),
               const SizedBox(height: 15),
               _buildSecondRowCards(),
@@ -114,10 +114,10 @@ class HomeDashboard extends StatelessWidget {
           borderRadius: BorderRadius.vertical(bottom: Radius.circular(40)),
           boxShadow: [
             BoxShadow(
-              color: Color(0x42000000),
-              blurRadius: 25,
-              spreadRadius: 2,
-              offset: Offset(0, 12),
+              color: Color(0x1A000000),
+              blurRadius: 12,
+              spreadRadius: 0,
+              offset: Offset(0, 4),
             ),
           ],
         ),
@@ -233,7 +233,6 @@ class HomeDashboard extends StatelessWidget {
   Widget _buildDocumentsCardWithBadge() {
     return Obx(() {
       final responseCount = documentStatusService.responseCount.value;
-
       return Stack(
         clipBehavior: Clip.none,
         children: [
@@ -283,44 +282,47 @@ class HomeDashboard extends StatelessWidget {
         ),
 
         // Announce Card with Badge
-        Obx(() => Stack(
-          clipBehavior: Clip.none,
-          children: [
-            CustomCard(
-              onTap: _navigateToAnnouncements,
-              text: "Announce..",
-              imagePath: "assets/dashboard/announcements_icon_3d.svg",
-            ),
+        Obx(
+          () => Stack(
+            clipBehavior: Clip.none,
+            children: [
+              CustomCard(
+                onTap: _navigateToAnnouncements,
+                text: "Announce..",
+                imagePath: "assets/dashboard/announcements_icon_3d.svg",
+              ),
 
-            // Badge on CustomCard
-            if (announceController.unreadCount.value > 0)
-              Positioned(
-                top: 5,
-                right: 5,
-                child: Container(
-                  padding: EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
-                  ),
-                  constraints: BoxConstraints(minWidth: 20, minHeight: 20),
-                  child: Text(
-                    announceController.unreadCount.value > 9 ?
-                    '9+' : announceController.unreadCount.value.toString(),
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 9,
-                      fontWeight: FontWeight.bold,
+              // Badge on CustomCard
+              if (announceController.unreadCount.value > 0)
+                Positioned(
+                  top: 5,
+                  right: 5,
+                  child: Container(
+                    padding: EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
                     ),
-                    textAlign: TextAlign.center,
+                    constraints: BoxConstraints(minWidth: 20, minHeight: 20),
+                    child: Text(
+                      announceController.unreadCount.value > 9
+                          ? '9+'
+                          : announceController.unreadCount.value.toString(),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ),
-              ),
-          ],
-        )),
+            ],
+          ),
+        ),
 
-        const SizedBox(height: 100, width: 100),
+        Container(margin: EdgeInsets.zero, width: 100, height: 100),
       ],
     );
   }

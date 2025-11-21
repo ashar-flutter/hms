@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:async'; // ✅ ADD THIS IMPORT
+import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
@@ -8,47 +8,33 @@ class ImgBBService {
 
   static Future<String?> uploadFile(XFile file) async {
     try {
-      print('🚀 Starting ImgBB upload...');
+      print('🚀 Starting ImgBB upload for: ${file.name}');
 
       // ✅ READ FILE AS BYTES
       List<int> fileBytes = await file.readAsBytes();
 
-      // ✅ CREATE MULTIPART REQUEST
-      var request = http.MultipartRequest(
-          'POST',
-          Uri.parse('https://api.imgbb.com/1/upload')
-      );
+      // ✅ CREATE BASE64 STRING
+      String base64Image = base64Encode(fileBytes);
 
-      // ✅ ADD API KEY AS FIELD
-      request.fields['key'] = apiKey;
+      print('📤 Sending Base64 request to ImgBB...');
 
-      // ✅ ADD FILE
-      request.files.add(
-        http.MultipartFile.fromBytes(
-          'image',
-          fileBytes,
-          filename: 'upload_${DateTime.now().millisecondsSinceEpoch}.jpg',
-        ),
-      );
+      // ✅ CREATE REQUEST BODY
+      var requestBody = {
+        'key': apiKey,
+        'image': base64Image,
+      };
 
-      print('📤 Sending request to ImgBB...');
+      // ✅ SEND POST REQUEST
+      var response = await http.post(
+        Uri.parse('https://api.imgbb.com/1/upload'),
+        body: requestBody,
+      ).timeout(Duration(seconds: 30));
 
-      // ✅ SEND REQUEST WITH TIMEOUT
-      var response = await request.send().timeout(
-        Duration(seconds: 30),
-        onTimeout: () {
-          print('⏰ Request timeout');
-          throw TimeoutException('ImgBB request timeout'); // ✅ Now works
-        },
-      );
-
-      // ✅ GET RESPONSE
-      var responseBody = await response.stream.bytesToString();
       print('📥 Response status: ${response.statusCode}');
-      print('📄 Response body: $responseBody');
+      print('📄 Response body: ${response.body}');
 
       if (response.statusCode == 200) {
-        var jsonData = jsonDecode(responseBody);
+        var jsonData = jsonDecode(response.body);
 
         if (jsonData['success'] == true) {
           String fileUrl = jsonData['data']['url'];

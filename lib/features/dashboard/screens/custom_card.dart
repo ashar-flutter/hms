@@ -75,18 +75,12 @@ class _CustomCardState extends State<CustomCard>
               borderRadius: BorderRadius.circular(14),
               color: Color(0xFFFFFFFF),
               boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.15),
-                  blurRadius: 25,
-                  spreadRadius: 1,
-                  offset: Offset(0, 8),
-                ),
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 10,
-                  spreadRadius: 0,
-                  offset: Offset(0, 2),
-                ),
+
+            BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 12,
+            spreadRadius: 0,
+            offset: Offset(0, 4),)
               ],
             ),
             child: Center(
@@ -107,16 +101,10 @@ class _CustomCardState extends State<CustomCard>
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.15),
-                          blurRadius: 12,
-                          spreadRadius: 1,
-                          offset: Offset(0, 4),
-                        ),
-                        BoxShadow(
-                          color: Colors.white.withValues(alpha: 0.6),
-                          blurRadius: 8,
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 6,
                           spreadRadius: 0,
-                          offset: Offset(-2, -2),
+                          offset: Offset(0, 2),
                         ),
                       ],
                     ),

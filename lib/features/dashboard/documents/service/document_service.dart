@@ -1,5 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
+
+import '../../../admin_dashboard/screens/employee_documents/pdupload_service.dart';
+import '../../../admin_dashboard/services/lib/services/imgbb_service.dart';
 
 class DocumentService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -11,10 +15,27 @@ class DocumentService {
     required String expiryDate,
     required String fileName,
     required String filePath,
+    required bool isPdf,
+
   }) async {
     try {
       final user = _auth.currentUser;
       if (user == null) throw Exception("User not logged in");
+
+      String? fileUrl;
+      if (filePath.isNotEmpty) {
+        final file = XFile(filePath);
+        if (isPdf) {
+          fileUrl = await PDUploadService.uploadFile(file);
+          print('📄 PDF uploaded to Supabase');
+        } else {
+          fileUrl = await ImgBBService.uploadFile(file);
+          print('🖼️ Image uploaded to ImgBB');
+        }
+        if (fileUrl == null) {
+          throw Exception("Failed to upload file");
+        }
+      }
 
       await _firestore.collection('documents').add({
         'userId': user.uid,
@@ -24,6 +45,8 @@ class DocumentService {
         'expiryDate': expiryDate,
         'fileName': fileName,
         'filePath': filePath,
+        'fileUrl': fileUrl,
+        'fileType': isPdf ? 'pdf' : 'image',
         'status': 'pending',
         'submittedAt': FieldValue.serverTimestamp(),
         'adminResponse': null,

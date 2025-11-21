@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
+
 class DocField extends StatelessWidget {
   final String text;
+  final FocusNode? focusNode;
+
   final TextEditingController? controller;
-  const DocField({super.key, required this.text, this.controller});
+  const DocField({
+    super.key,
+    required this.text,
+    this.controller,
+    this.focusNode,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +27,8 @@ class DocField extends StatelessWidget {
         ],
       ),
       child: TextField(
+        focusNode: focusNode,
+
         controller: controller,
         textInputAction: TextInputAction.done,
         onEditingComplete: () => FocusScope.of(context).unfocus(),
@@ -34,15 +44,20 @@ class DocField extends StatelessWidget {
           hintText: text,
           filled: true,
           fillColor: Colors.white,
-          hintStyle: TextStyle(color: Colors.grey.shade900, fontSize: 13,
-          fontFamily: "poppins"
+          hintStyle: TextStyle(
+            color: Colors.grey.shade900,
+            fontSize: 13,
+            fontFamily: "poppins",
           ),
-          contentPadding:
-          const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 16,
+          ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(30),
-            borderSide:
-            BorderSide(color: Colors.grey.shade300.withValues(alpha: 0.9)),
+            borderSide: BorderSide(
+              color: Colors.grey.shade300.withValues(alpha: 0.9),
+            ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(30),

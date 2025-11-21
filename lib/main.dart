@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hr_flow/features/splash/splash_screen.dart';
 import 'features/Announce/employee_announce_controller.dart';
+import 'features/admin_dashboard/screens/employee_documents/supabase_service.dart';
 import 'features/admin_dashboard/screens/reports/report_controller.dart';
 import 'features/dashboard/documents/service/document_count_service.dart';
 import 'features/dashboard/documents/service/user_document_status_service.dart';
@@ -13,6 +14,8 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+
 
   Get.put(DocumentCountService(), permanent: true);
   Get.put(UserDocumentStatusService(), permanent: true);

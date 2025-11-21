@@ -81,56 +81,44 @@ class _MainDashboardState extends State<MainDashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBody: true,
-      body: _screens[_selectedIndex],
+      extendBody: false, // ✅ Change to false
+      backgroundColor: Colors.white,
+      body: Container(
+          color: Colors.white,
+
+          child: _screens[_selectedIndex]),
       bottomNavigationBar: _buildBottomNavBar(),
     );
   }
-
   Widget _buildBottomNavBar() {
-    return SizedBox(
-      height: 90,
-      child: Stack(
-        alignment: Alignment.bottomCenter,
-        children: [
-          Container(
-            height: 70,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Color(0x33000000),
-                  blurRadius: 25,
-                  spreadRadius: 2,
-                  offset: Offset(0, -5),
-                ),
-                BoxShadow(
-                  color: Color(0x1A000000),
-                  blurRadius: 10,
-                  spreadRadius: 1,
-                  offset: Offset(0, -2),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildNavItem(_navItems[0], 0),
-                _buildNavItem(_navItems[1], 1),
-                _buildNavItemWithBadge(_navItems[2], 2),
-                _buildNavItem(_navItems[3], 3),
-              ],
-            ),
+    return Container(
+      height: 70, // ✅ Fixed height only
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1), // ✅ Fix: withOpacity
+            blurRadius: 10,
+            spreadRadius: 0,
+            offset: const Offset(0, -2),
           ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _buildNavItem(_navItems[0], 0),
+          _buildNavItem(_navItems[1], 1),
+          _buildNavItemWithBadge(_navItems[2], 2),
+          _buildNavItem(_navItems[3], 3),
         ],
       ),
     );
   }
-
   Widget _buildNavItem(Map<String, dynamic> item, int index) {
     final bool isSelected = _selectedIndex == item['index'];
     final IconData icon = item['icon'];

@@ -25,17 +25,12 @@ class AttendanceCard extends StatelessWidget {
         ),
 
         boxShadow: [
+
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 20,
-            spreadRadius: 2,
-            offset: Offset(0, 8),
-          ),
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 10,
-            spreadRadius: 1,
-            offset: Offset(0, 4),
+            color: Colors.black.withValues(alpha: 0.15),
+            blurRadius: 12,
+            spreadRadius: 0,
+            offset: Offset(0, 6),
           ),
         ],
       ),
@@ -150,8 +145,9 @@ class AttendanceCard extends StatelessWidget {
                     color: const Color(0xFFFFFFFF),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
+                        color: Colors.black.withValues(alpha: 0.08),
                         blurRadius: 8,
+                        spreadRadius: 0,
                         offset: Offset(0, 3),
                       ),
                     ],
